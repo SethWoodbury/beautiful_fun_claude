@@ -116,24 +116,24 @@ _credits() {
     local band title
     band=$(_pick "$seed" DISCO_NEON DISCO_CANDY DISCO_VAPOR RING RACE_GOLD FIRE_VIOLET)
     title=$(_pick "$(( seed+2 ))" 'CERTIFIED LEGEND' 'THE G.O.A.T.' '10x DEVELOPER' 'BUG SLAYER' 'CODE ROYALTY' 'ABSOLUTE UNIT' 'KEYBOARD WARRIOR' 'SHIP-IT CHAMPION' 'RUBBER-DUCK WHISPERER' 'STACK OVERFLOWER' 'CAFFEINE-POWERED HERO' 'TOUCHED GRASS ONCE')
-    if   [ "$pm" -lt 140 ]; then local t=' ...mic check... ' tl lp; tl=${#t}; lp=$(( (span-tl-2)/2 )); [ "$lp" -lt 0 ] && lp=0      # 🎤 tap tap
+    if   [ "$pm" -lt 150 ]; then local t=' ...mic check... ' tl lp; tl=${#t}; lp=$(( (span-tl-2)/2 )); [ "$lp" -lt 0 ] && lp=0      # 🎤 tap tap
         printf '%s🎤%s%s' "$(_dots "$lp")" "$(_text "$t" "$off" SMOKE)" "$(_dots $(( span-lp-tl-2<0?0:span-lp-tl-2 )))"
     elif [ "$pm" -lt 300 ]; then local t=' ...drumroll... ' tl lp; tl=${#t}; lp=$(( (span-tl-2)/2 )); [ "$lp" -lt 0 ] && lp=0       # 🥁 build-up
         printf '%s🥁%s%s' "$(_dots "$lp")" "$(_text "$t" "$off" FIRE_EMBER)" "$(_dots $(( span-lp-tl-2<0?0:span-lp-tl-2 )))"
-    elif [ "$pm" -lt 430 ]; then local t=' INTRODUCING... ' tl lp; tl=${#t}; lp=$(( (span-tl-4)/2 )); [ "$lp" -lt 0 ] && lp=0       # 🔦 spotlights
+    elif [ "$pm" -lt 380 ]; then local t=' INTRODUCING... ' tl lp; tl=${#t}; lp=$(( (span-tl-4)/2 )); [ "$lp" -lt 0 ] && lp=0       # 🔦 spotlights
         printf '%s🔦%s🔦%s' "$(_dots "$lp")" "$(_text "$t" "$off" "$band")" "$(_dots $(( span-lp-tl-4<0?0:span-lp-tl-4 )))"
-    elif [ "$pm" -lt 760 ]; then local nm="$NAME" nl=$L fo lp rp                                                                  # 🌟 THE BIG REVEAL (held), name flashing
+    elif [ "$pm" -lt 520 ]; then local nm="$NAME" nl=$L fo lp rp                                                                  # 🌟 THE BIG REVEAL, name flashing
         [ $(( nl+6 )) -gt "$span" ] && { nm="${NAME:0:$(( span>7?span-7:1 ))}…"; nl=${#nm}; }
         fo=$(( off*3+pm/4 )); lp=$(( (span-nl-6)/2 )); [ "$lp" -lt 0 ] && lp=0; rp=$(( span-lp-nl-6 )); [ "$rp" -lt 0 ] && rp=0
         printf '%s🌟 %s 🌟%s' "$(_dots "$lp")" "$(_text "$nm" "$fo" "$band")" "$(_dots "$rp")"
-    elif [ "$pm" -lt 880 ]; then local tt=" $title " tl lp                                                                        # 👑 a gloriously silly title
+    elif [ "$pm" -lt 840 ]; then local tt=" $title " tl lp fo                                                                     # 👑 a gloriously silly title (HELD ~4s, flashing)
         tl=${#tt}; [ $(( tl+4 )) -gt "$span" ] && { tt="${tt:0:$(( span>5?span-5:1 ))}…"; tl=${#tt}; }
-        lp=$(( (span-tl-4)/2 )); [ "$lp" -lt 0 ] && lp=0
-        printf '%s👑%s👑%s' "$(_dots "$lp")" "$(_text "$tt" "$off" RACE_GOLD)" "$(_dots $(( span-lp-tl-4<0?0:span-lp-tl-4 )))"
-    elif [ "$pm" -lt 960 ]; then local s='' n=$span i; local -n BP="$band"; local bm=${#BP[@]} CR=(🎉 🙌 🤘 🎊 🥳)               # 🎉 the crowd goes WILD
+        fo=$(( off*2+pm/5 )); lp=$(( (span-tl-4)/2 )); [ "$lp" -lt 0 ] && lp=0
+        printf '%s👑%s👑%s' "$(_dots "$lp")" "$(_text "$tt" "$fo" RACE_GOLD)" "$(_dots $(( span-lp-tl-4<0?0:span-lp-tl-4 )))"
+    elif [ "$pm" -lt 900 ]; then local s='' n=$span i; local -n BP="$band"; local bm=${#BP[@]} CR=(🎉 🙌 🤘 🎊 🥳)               # 🎉 the crowd goes WILD
         for ((i=0;i<n;i++)); do if [ $(( (i+off)%5 )) -eq 0 ]; then s+=$'\e[1m'"${CR[$(( (i/5+off)%5 ))]}"$'\e[0m'; ((i++)); else s+=$'\e[38;5;'"${BP[$(( (i+off)%bm ))]}"m'▀'; fi; done
         printf '%s%s' "$s" "$R"
-    else local ct="$NAME · beautiful_fun_claude" cl lp rp                                                                         # 🎉 finale card (credits the framework)
+    else local ct="$NAME · $title · beautiful_fun_claude" cl lp rp                                                                # 🎉 finale card: name + title + framework (held ~2s)
         cl=${#ct}; [ $(( cl+6 )) -gt "$span" ] && { ct="${ct:0:$(( span>7?span-7:1 ))}…"; cl=${#ct}; }
         lp=$(( (span-cl-6)/2 )); [ "$lp" -lt 0 ] && lp=0; rp=$(( span-lp-cl-6 )); [ "$rp" -lt 0 ] && rp=0
         printf '%s🎉 %s 🎉%s' "$(_dots "$lp")" "$(_text "$ct" "$off" "$band")" "$(_dots "$rp")"; fi

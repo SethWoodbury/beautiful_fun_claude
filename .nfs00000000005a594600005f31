@@ -46,7 +46,7 @@ else width=${SIMW:-$ANIM_MAXW}; fi
 [ "$width" -gt "$ANIM_MAXW" ] && width=$ANIM_MAXW
 
 # frames per style (signature reels run longer, matching statusline.sh)
-frames_of() { case "$1" in seth) echo 18 ;; credits) echo 14 ;; *) echo "$ANIM_FRAMES" ;; esac; }
+frames_of() { [ "$1" = seth ] && echo 18 || echo "$ANIM_FRAMES"; }
 pm_of() { local fr=${2:-$ANIM_FRAMES}; [ "$fr" -gt 1 ] && echo $(( $1 * 1000 / (fr-1) )) || echo 0; }
 
 dispw() {  # display width (emoji=2), via python3 if present

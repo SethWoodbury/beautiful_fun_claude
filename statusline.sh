@@ -196,7 +196,7 @@ _animation() {
     now=$(date +%s)
     win=$(( now / ANIM_EVERY ))
     style="${ANIM_STYLES[$(( win % ${#ANIM_STYLES[@]} ))]}"
-    frames=$ANIM_FRAMES; [ "$style" = seth ] && frames=18   # the author's signature reel runs longer (18s); credits uses the default
+    frames=$ANIM_FRAMES; [ "$style" = seth ] && frames=18; [ "$style" = credits ] && frames=14   # signature reels run longer
     phase=$(( now % ANIM_EVERY ))
     [ "$phase" -lt "$frames" ] || return 0
     declare -F anim_frame >/dev/null 2>&1 || . "$ANIM_LIB" 2>/dev/null
