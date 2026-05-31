@@ -179,10 +179,13 @@ anim_frame() {
     local pos=$(( pm*span/1000 )) i
 
     case "$style" in
-        rainbow)     local s='' n=$(( w-2 )) sweep; sweep=$(( pm*(n-1)/1000 ))      # rainbow + a bright white shimmer sweeping across
-                     for ((i=0;i<n;i++)); do local dd=$(( i-sweep )); [ "$dd" -lt 0 ] && dd=$(( -dd ))
-                         if [ "$dd" -le 1 ]; then s+=$'\e[1;38;5;231m''█'; else s+=$'\e[38;5;'"${RING[$(( (i+off)%NR ))]}"m'█'; fi; done
-                     printf '%s%s' "$s" "$R" ;;
+        rainbow)     local n=$(( w-2 ))                                              # rainbow + a bright shimmer glint -> 🌈 payoff
+                     if   [ "$pm" -lt 920 ]; then local s='' sweep; sweep=$(( pm*(n-1)/920 ))
+                         for ((i=0;i<n;i++)); do local dd=$(( i-sweep )); [ "$dd" -lt 0 ] && dd=$(( -dd ))
+                             if [ "$dd" -eq 0 ]; then s+=$'\e[1;38;5;231m''█'; elif [ "$dd" -le 2 ]; then s+=$'\e[1;38;5;195m''█'; else s+=$'\e[38;5;'"${RING[$(( (i+off)%NR ))]}"m'█'; fi; done
+                         printf '%s%s' "$s" "$R"
+                     elif [ $(( seed%2 )) -eq 0 ]; then local s='' i; for ((i=0;i<n;i++)); do if [ $(( (i+off)%6 )) -eq 0 ]; then s+=$'\e[1m''🌈'; ((i++)); else s+=$'\e[1;38;5;'"${RING[$(( (i+off)%NR ))]}"m'█'; fi; done; printf '%s%s' "$s" "$R"
+                     else local s='' i; for ((i=0;i<n;i++)); do if [ $(( (i*7+off)%9 )) -eq 0 ]; then s+=$'\e[1;38;5;231m''✨'; ((i++)); else s+=$'\e[38;5;'"${RING[$(( (i+off)%NR ))]}"m'█'; fi; done; printf '%s%s' "$s" "$R"; fi ;;
         nyan)        if   [ "$pm" -lt 900 ]; then local s='' tn; tn=$(( pm*(span-2)/900 )); [ "$tn" -gt $(( span-2 )) ] && tn=$(( span-2 )); [ "$tn" -lt 0 ] && tn=0   # 🐱 + rainbow stripe trail + ⭐
                          for ((i=0;i<tn;i++)); do if [ "$i" -lt $(( tn-1 )) ] && [ $(( (i+off)%7 )) -eq 0 ]; then s+=$'\e[1;38;5;231m''⭐'; ((i++)); else s+=$'\e[38;5;'"${RING[$(( (i+off)%NR ))]}"m'▬'; fi; done
                          printf '%s%s🐱%s' "$s" "$R" "$(_dots $(( span-tn-2<0?0:span-tn-2 )))"
@@ -255,7 +258,8 @@ anim_frame() {
                              else s+=$'\e[38;5;236m''·'; fi; done
                          printf '%s%s' "$s" "$R"; fi ;;
         fireworks)   local c=$(( (w-2)/2 )); local fp; fp="$(_pick "$seed" FIRE_CLASSIC FIRE_EMBER FIRE_VIOLET)"
-                     if [ "$pm" -lt 120 ]; then printf '%s\e[38;5;245m.%s' "$(_dots "$c")" "$R"   # a lone fuse climbing
+                     if [ "$pm" -lt 120 ]; then local fpos; fpos=$(( pm*c/120 )); [ "$fpos" -gt $(( c-1 )) ] && fpos=$(( c-1 )); [ "$fpos" -lt 0 ] && fpos=0   # the fuse visibly CLIMBS
+                         printf '%s\e[1;38;5;226m!%s%s' "$(_fade "$fpos" '·' FIRE_EMBER R)" "$R" "$(_dots $(( w-fpos-1<0?0:w-fpos-1 )))"
                      elif [ "$pm" -lt 900 ]; then local s='' n=$(( w-2 )) j; local -n FP="$fp"; local fm=${#FP[@]}   # three staggered bursts + glowing debris
                          local cen=( $(( n/5 )) $(( n/2 )) $(( 4*n/5 )) ) ign=( 120 360 600 )
                          for ((i=0;i<n;i++)); do local ch='' boom=0
@@ -338,16 +342,23 @@ anim_frame() {
                      else local lung=''; [ "$gap" -le 2 ] && lung='💨'; local aft=$(( span-preycol-gap-4 )); [ "$aft" -lt 0 ] && aft=0
                          printf '%s%s%s%s%s%s' "$(_dots "$preycol")" "$pr" "$(_cycle "$gap" '·' "$off" SMOKE)" "$pd" "$lung" "$(_dots "$aft")"; fi ;;
 
-        party)       local PR=(🥳 🎉 🦄 🤡 🎈 🥁 🎺 🐘 🎊 🪅) out='' n=$(( w-2 )) cp; cp="$(_pick "$seed" DISCO_NEON DISCO_CANDY DISCO_VAPOR RING)"; local -n CP="$cp"; local cm=${#CP[@]}
-                     for ((i=0;i<n;i++)); do if [ $(( (i+off)%5 )) -eq 0 ]; then out+=$'\e[1m'"${PR[$(( (i/5+off)%${#PR[@]} ))]}"$'\e[0m'; ((i++))
-                         else out+=$'\e[38;5;'"${CP[$(( (i+off)%cm ))]}"m'▀'; fi; done
-                     printf '%s' "$out" ;;
-        dance)       local DA=(🕺 💃 👯 🪩 🥳 🤖 🦄) out='' n=$(( w-2 )) cen=$(( (w-9)/2 )) cp; cp="$(_pick "$seed" DISCO_NEON DISCO_VAPOR RING)"; local -n CD="$cp"; local cm=${#CD[@]}
-                     local txt; txt="$(_text '♪DANCE♪' "$off" RING)"
-                     for ((i=0;i<n;i++)); do if [ "$i" -eq "$cen" ]; then out+="$txt"; i=$(( i+8 )); continue; fi
-                         if [ $(( (i+off)%4 )) -eq 0 ]; then out+=$'\e[1m'"${DA[$(( (i/4+off)%${#DA[@]} ))]}"$'\e[0m'; ((i++))
-                         else out+=$'\e[38;5;'"${CD[$(( (i+off)%cm ))]}"m'▀'; fi; done
-                     printf '%s%s' "$out" "$R" ;;
+        party)       local n=$(( w-2 )) cp PR out=$(( seed%4 ))                       # themed confetti BUILDS -> 🎉 DROP
+                     case "$out" in 0) PR=(🥳 🎉 🎈 🎁 🎂) ;; 1) PR=(🪩 🕺 💃 🎶 ✨) ;; 2) PR=(🤡 🎪 🐘 🎠 🎟) ;; *) PR=(🎆 🥂 ✨ 🎇 🍾) ;; esac
+                     cp="$(_pick "$seed" DISCO_NEON DISCO_CANDY DISCO_VAPOR RING)"; local -n CP="$cp"; local cm=${#CP[@]}
+                     if   [ "$pm" -lt 850 ]; then local out2='' i gap; gap=$(( 7-pm/170 )); [ "$gap" -lt 3 ] && gap=3
+                         for ((i=0;i<n;i++)); do if [ $(( (i+off)%gap )) -eq 0 ]; then out2+=$'\e[1m'"${PR[$(( (i/gap+off)%${#PR[@]} ))]}"$'\e[0m'; ((i++)); else out2+=$'\e[38;5;'"${CP[$(( (i+off)%cm ))]}"m'▀'; fi; done
+                         printf '%s' "$out2"
+                     else local t=' 🎉 PARTY! 🎉 ' dw lp rp; dw=$(( ${#t}+4 )); lp=$(( (n-dw)/2 )); [ "$lp" -lt 0 ] && lp=0; rp=$(( n-dw-lp )); [ "$rp" -lt 0 ] && rp=0
+                         printf '%s%s%s' "$(_cycle "$lp" '▀' "$off" FLASH)" "$(_text "$t" "$off" FLASH)" "$(_cycle "$rp" '▀' "$off" FLASH)"; fi ;;
+        dance)       local n=$(( w-2 )) cp DA out=$(( seed%3 )) cen=$(( (w-9)/2 ))     # dancers + ♪DANCE♪ BUILD -> 🪩 DROP
+                     case "$out" in 0) DA=(🕺 💃 👯 🪩) ;; 1) DA=(🤖 🦾 ⚙ 🪩) ;; *) DA=(🦄 🌈 🦓 🪩) ;; esac
+                     cp="$(_pick "$seed" DISCO_NEON DISCO_VAPOR RING)"; local -n CD="$cp"; local cm=${#CD[@]}
+                     if   [ "$pm" -lt 850 ]; then local out2='' i txt; txt="$(_text '♪DANCE♪' "$off" RING)"
+                         for ((i=0;i<n;i++)); do if [ "$i" -eq "$cen" ]; then out2+="$txt"; i=$(( i+8 )); continue; fi
+                             if [ $(( (i+off)%4 )) -eq 0 ]; then out2+=$'\e[1m'"${DA[$(( (i/4+off)%${#DA[@]} ))]}"$'\e[0m'; ((i++)); else out2+=$'\e[38;5;'"${CD[$(( (i+off)%cm ))]}"m'▀'; fi; done
+                         printf '%s%s' "$out2" "$R"
+                     else local t=' 🪩 DROP THE BEAT 🪩 ' dw lp rp; dw=$(( ${#t}+4 )); [ "$dw" -gt "$n" ] && { t=' 🪩 DISCO! 🪩 '; dw=$(( ${#t}+4 )); }; lp=$(( (n-dw)/2 )); [ "$lp" -lt 0 ] && lp=0; rp=$(( n-dw-lp )); [ "$rp" -lt 0 ] && rp=0
+                         printf '%s%s%s' "$(_cycle "$lp" '▀' "$off" FLASH)" "$(_text "$t" "$off" FLASH)" "$(_cycle "$rp" '▀' "$off" FLASH)"; fi ;;
 
         converge)    local half=$(( (w-2)/2 )) fn cp out; fn=$(( pm*half/700 )); [ "$fn" -gt "$half" ] && fn=$half; cp="$(_pick "$seed" RING FIRE_CLASSIC ICE_GLACIER DISCO_NEON)"; out=$(( seed%4 ))
                      if [ "$pm" -lt 730 ]; then local mid=$(( (w-2)-2*fn )); [ "$mid" -lt 0 ] && mid=0
@@ -355,11 +366,13 @@ anim_frame() {
                      else local t pal dw; case "$out" in 0) t=' ✦BOOM✦ ' pal=FIRE_CLASSIC dw=10 ;; 1) t=' KABOOM! ' pal=FLASH dw=8 ;; 2) t=' FUSION! ' pal=ELECTRIC dw=8 ;; *) t=' ✦SMASH✦ ' pal=FIRE_VIOLET dw=10 ;; esac
                          local sw=$(( ((w-2)-dw)/2 )); [ "$sw" -lt 0 ] && sw=0; local rw=$(( (w-2)-dw-sw )); [ "$rw" -lt 0 ] && rw=0
                          printf '%s%s%s' "$(_cycle "$sw" '█' "$off" "$cp")" "$(_text "$t" "$off" "$pal")" "$(_cycle "$rw" '█' $((off+7)) "$cp")"; fi ;;
-        marquee)     local MSGS=('>> CLAUDE CODE << keep shipping >> ' '++ stay caffeinated ++ touch grass ++ ' '~~ vibe coding ~~ small diffs win ~~ ')
-                     local msg="${MSGS[$(( seed%3 ))]}"; local ml=${#msg}; [ "$ml" -lt 1 ] && ml=1
-                     local winw=$(( w-2 )) full='' start k
-                     for ((k=0; k*ml < winw+ml; k++)); do full+="$msg"; done
-                     start=$(( pm*(ml-1)/1000 )); _text "${full:start:winw}" "$off" RING ;;
+        marquee)     local MSGS=('>> CLAUDE CODE << keep shipping >> ' '++ stay caffeinated ++ touch grass ++ ' '~~ vibe coding ~~ small diffs win ~~ ' '== 0 bugs == 100% vibes == ' '<< commit << push << repeat << ' '** be unreasonably good ** ') band; band=$(_pick "$(( seed+2 ))" RING DISCO_NEON DISCO_VAPOR RACE_GOLD)
+                     if   [ "$pm" -lt 900 ]; then local msg="${MSGS[$(( seed%6 ))]}" ml winw=$(( w-2 )) full='' start k; ml=${#msg}; [ "$ml" -lt 1 ] && ml=1
+                         for ((k=0; k*ml < winw+ml; k++)); do full+="$msg"; done
+                         start=$(( pm*(ml-1)/900 )); _text "${full:start:winw}" "$off" "$band"
+                     else local t; case "$(( seed%3 ))" in 0) t=' 🚀 SHIP IT 🚀 ' ;; 1) t=' ✨ LGTM ✨ ' ;; *) t=' ☕ REFILL ☕ ' ;; esac
+                         local dw=$(( ${#t}+4 )) lp rp; lp=$(( ((w-2)-dw)/2 )); [ "$lp" -lt 0 ] && lp=0; rp=$(( (w-2)-dw-lp )); [ "$rp" -lt 0 ] && rp=0
+                         printf '%s%s%s' "$(_cycle "$lp" '▰' "$off" FLASH)" "$(_text "$t" "$off" FLASH)" "$(_cycle "$rp" '▰' "$off" FLASH)"; fi ;;
 
         abduct)      local VIC=(🐄 🚜 🧍 🐑) v; v=${VIC[$(( seed%4 ))]}; local vc=$(( span/3 )) okk=$(( seed%3 ))
                      local beam; beam="$(_cycle 3 '┊' "$off" TOX_NEON)"
@@ -609,14 +622,16 @@ anim_frame() {
                          printf '🧬%s%s%s' "$(_cycle "$lp" '●' "$off" GFP_GLOW)" "$(_text "$t" "$off" GFP_GLOW)" "$(_cycle "$rp" '●' "$off" GFP_GLOW)"
                      else local t=' STOP CODON?! ' tl lp rp; tl=${#t}; lp=$(( (span-tl-4)/2 )); [ "$lp" -lt 0 ] && lp=0; rp=$(( span-tl-4-lp )); [ "$rp" -lt 0 ] && rp=0
                          printf '🛑%s%s%s😅' "$(_dots "$lp")" "$(_text "$t" "$off" FIRE_CLASSIC)" "$(_dots "$rp")"; fi ;;
-        benzene)     local out=$(( seed%4 )) cp ring; cp=$(_pick "$seed" DISCO_NEON DISCO_VAPOR DISCO_CANDY)   # ⏣ a benzene ring boogies -> AROMATIC! 💅
-                     ring=$( [ $(( (pm/111)%2 )) -eq 0 ] && printf '⏣' || printf '⌬' )
-                     if   [ "$pm" -lt 820 ]; then local rc=$pos; [ "$rc" -gt $(( span-1 )) ] && rc=$(( span-1 ))
+        benzene)     local out=$(( seed%3 )) cp ring; cp=$(_pick "$seed" DISCO_NEON DISCO_VAPOR DISCO_CANDY)   # ⏣ benzene ring SPINS across -> AROMATIC / RESONANCE / DELOCALIZED
+                     ring=$( [ $(( (pm/55)%2 )) -eq 0 ] && printf '⏣' || printf '⌬' )
+                     if   [ "$pm" -lt 670 ]; then local rc=$pos; [ "$rc" -gt $(( span-1 )) ] && rc=$(( span-1 ))
                          printf '%s\e[1;38;5;201m%s%s%s' "$(_cycle "$rc" '◦' "$off" "$cp")" "$ring" "$R" "$(_dots $(( span-rc-1<0?0:span-rc-1 )))"
-                     elif [ "$out" -ne 3 ]; then local t=' AROMATIC! ' tl lp rp; tl=${#t}; lp=$(( (span-tl-2)/2 )); [ "$lp" -lt 0 ] && lp=0; rp=$(( span-tl-2-lp )); [ "$rp" -lt 0 ] && rp=0
+                     elif [ "$out" -eq 0 ]; then local t=' AROMATIC! ' tl lp rp; tl=${#t}; lp=$(( (span-tl-2)/2 )); [ "$lp" -lt 0 ] && lp=0; rp=$(( span-tl-2-lp )); [ "$rp" -lt 0 ] && rp=0
                          printf '%s%s%s💅' "$(_cycle "$lp" '◦' "$off" "$cp")" "$(_text "$t" "$off" DISCO_CANDY)" "$(_cycle "$rp" '◦' "$off" "$cp")"
-                     else local t=' RESONANCE!! ' tl lp rp; tl=${#t}; lp=$(( (span-tl-2)/2 )); [ "$lp" -lt 0 ] && lp=0; rp=$(( span-tl-2-lp )); [ "$rp" -lt 0 ] && rp=0
-                         printf '%s%s%s💫' "$(_cycle "$lp" '⌬' "$off" "$cp")" "$(_text "$t" "$off" DISCO_VAPOR)" "$(_cycle "$rp" '⏣' "$off" "$cp")"; fi ;;
+                     elif [ "$out" -eq 1 ]; then local t=' RESONANCE!! ' tl lp rp; tl=${#t}; lp=$(( (span-tl-2)/2 )); [ "$lp" -lt 0 ] && lp=0; rp=$(( span-tl-2-lp )); [ "$rp" -lt 0 ] && rp=0
+                         printf '%s%s%s💫' "$(_cycle "$lp" '⌬' "$off" "$cp")" "$(_text "$t" "$off" DISCO_VAPOR)" "$(_cycle "$rp" '⏣' "$off" "$cp")"
+                     else local t=' DELOCALIZED~ ' tl lp rp; tl=${#t}; lp=$(( (span-tl-2)/2 )); [ "$lp" -lt 0 ] && lp=0; rp=$(( span-tl-2-lp )); [ "$rp" -lt 0 ] && rp=0
+                         printf '%s%s%s✨' "$(_cycle "$lp" '◦' "$off" "$cp")" "$(_text "$t" "$off" RING)" "$(_cycle "$rp" '◦' "$off" "$cp")"; fi ;;
         r2d2)        local out=$(( seed%6 )) dz=$(( span-2 ))                                            # ╒◉╕ astromech rolls in, holograms, zaps the blast-door
                      if   [ "$pm" -lt 220 ]; then local t=' *boop-beep* ' tl lp; tl=${#t}; [ $(( tl+5 )) -gt "$span" ] && { t=' beep! '; tl=${#t}; }; lp=$(( (span-tl-5)/2 )); [ "$lp" -lt 0 ] && lp=0
                          printf '╒◉╕%s%s%s║▒' "$(_dots "$lp")" "$(_text "$t" "$off" ELECTRIC)" "$(_dots $(( span-tl-lp-5<0?0:span-tl-lp-5 )))"
@@ -687,7 +702,7 @@ anim_frame() {
                      else local t=' …just smoke ' tl lp rp; tl=${#t}; lp=$(( (span-tl-4)/2 )); [ "$lp" -lt 0 ] && lp=0; rp=$(( span-tl-4-lp )); [ "$rp" -lt 0 ] && rp=0
                          printf '🌬%s%s%s🌋' "$(_cycle "$lp" '░' "$off" LAVA_ASH)" "$(_text "$t" "$off" LAVA_ASH)" "$(_dots "$rp")"; fi ;;
         dragon)      local fate=$(( seed%4 )) m=${#DRAGON_FIRE[@]}                                       # 🐉 inhales, breathes a gradient fire-breath -> TOASTY / HOARD / burp
-                     if   [ "$pm" -lt 330 ]; then local gl; gl=$(( pm/110 )); printf '🐉%s%s' "$(_cycle $(( 2+gl )) '◦' "$off" DRAGON_FIRE)" "$(_dots $(( span-4-gl<0?0:span-4-gl )))"
+                     if   [ "$pm" -lt 330 ]; then local gl; gl=$(( pm/82 )); printf '🐉%s\e[1;38;5;231m‹%s%s' "$(_fade $(( 2+gl )) '◦' DRAGON_FIRE L)" "$R" "$(_dots $(( span-5-gl<0?0:span-5-gl )))"   # inhale: glow gathers + ‹ air intake
                      elif [ "$pm" -lt 900 ]; then local bl s='' i; bl=$(( (pm-330)*(span-2)/570 )); [ "$bl" -lt 1 ] && bl=1; [ "$bl" -gt $(( span-2 )) ] && bl=$(( span-2 ))
                          for ((i=0;i<bl;i++)); do local idx gl; idx=$(( i*(m-1)/(bl>1?bl-1:1) )); [ "$idx" -ge "$m" ] && idx=$(( m-1 )); if [ $(( i*3 )) -lt "$bl" ]; then gl='█'; elif [ $(( i*2 )) -lt "$bl" ]; then gl='▓'; else gl='▒'; fi; s+=$'\e[38;5;'"${DRAGON_FIRE[$idx]}"m"$gl"; done
                          printf '🐉%s%s%s' "$s" "$R" "$(_dots $(( span-bl-2<0?0:span-bl-2 )))"
