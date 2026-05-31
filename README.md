@@ -1,14 +1,16 @@
 # 🌈 beautiful_fun_claude
 
-A gorgeous, ridiculous, **fun** status line for [Claude Code](https://code.claude.com/docs/en/statusline) — a calm, colorful info bar most of the time, with periodic full‑width **animated cameos** (a wizard battle, races with photo finishes and wipeouts, a hyperdrive jump, a matrix‑style decrypt, a llama spitting, a T‑rex who can't reach the snack, a self‑destruct that just says "jk", nyan‑cat, fireworks, and more — **35 in all**).
+A gorgeous, ridiculous, **fun** status line for [Claude Code](https://code.claude.com/docs/en/statusline) — a calm, colorful info bar most of the time, with periodic full‑width **animated cameos** (a wizard battle, races with photo finishes and wipeouts, a hyperdrive jump, a matrix‑style decrypt, a llama spitting, a T‑rex who can't reach the snack, a self‑destruct that just says "jk", nyan‑cat, fireworks, and more — **36 in all**).
 
 ![status bar](assets/statusbar.svg)
 
-Every ~20 seconds the whole bar briefly turns into a full‑width animation — a race finish, the signature wizard battle, and 30+ more:
+Every ~20 seconds the whole bar briefly turns into a full‑width animation — the signature wizard‑battle's energy clash, and 30+ more:
+
+![seth wizard energy clash](assets/seth.svg)
+
+![computa](assets/computa.svg)
 
 ![race finish](assets/race.svg)
-
-![seth signature](assets/seth.svg)
 
 <sub>(GitHub can't show ANSI color in a code block, so these are SVG snapshots of real output — on your machine the colors are live and the cameos animate.)</sub>
 
@@ -110,22 +112,44 @@ Everything lives in the **CONFIG** and **PALETTE** blocks at the top of `~/.clau
 | `SHOW_MASCOT`/`SHOW_QUIP`/`SHOW_DIR`/`SHOW_SEVEN_DAY`/… | `1` | Per‑segment toggles. |
 | `TZ_OVERRIDE` | `""` | Pin a timezone (default = system local). |
 | `EMOJI`/`QUIPS`/`DECO` | — | The mascot pool, quip list, end‑cap gradient. |
-| `SIG_NAME`/`SIG_GH` | — | **Your** name + GitHub handle for the customizable `credits` animation (in `statusline-animations.sh`). |
+| `SIG_NAME`/`SIG_GH` | `David Baker <insert_your_name>` | **Your** name (+ handle) for the customizable `credits` hype reel (in `statusline-animations.sh`). Replace the placeholder. |
 
 Animation palettes and per‑style color/behavior live in `~/.claude/statusline-animations.sh`.
 
-## The animations (35)
+## The animations (36)
 
-`rainbow nyan mouse ufo comet caterpillar fish train wave sparkle fireworks race fight chase party dance converge marquee abduct duel rocket pacman snake meteor llama bananapeel trex selfdestruct warp decrypt radar helix boot seth credits`
+`rainbow nyan mouse ufo comet caterpillar fish train wave sparkle fireworks race fight chase party dance converge marquee abduct duel rocket pacman snake meteor llama bananapeel trex selfdestruct computa warp decrypt radar helix boot seth credits`
 
 Highlights:
 
 - **Classics & action:** **race** (random lead changes, photo finishes, ~25% wipeouts), **fight** (random knockbacks + winner), **chase** (early/late catch or escape), **rocket** (`T-3→LIFTOFF` then orbit/RUD/abort), **mouse** (a 🐭 cheese‑heist with three endings), **pacman**, **snake**, **fireworks** (staggered multi‑burst), **meteor** (a 🚀 intercepts an incoming ☄ — deflect or impact).
-- **Silly:** **llama** (spit that sometimes boomerangs into its own face), **bananapeel** (glorious wipeout, rare dodge), **trex** (tiny arms, eternal near‑miss, or a 🦅 helps), **selfdestruct** (a 5…0 countdown that just says "…jk" — rarely an actual KABOOM).
+- **Silly:** **llama** (spit that sometimes boomerangs into its own face), **bananapeel** (glorious wipeout, rare dodge), **trex** (tiny arms, eternal near‑miss, or a 🦅 helps), **selfdestruct** (a 5…0 countdown that just says "…jk" — rarely an actual KABOOM), **computa** (a robot dutifully executing *"COMPUTA, MAKE THESE claude bfc USERS SUPA &lt;kind&gt; AND &lt;respectful&gt;"* — both words randomized).
 - **Sci‑fi / aesthetic:** **warp** (hyperdrive star‑streaks → JUMP), **decrypt** (matrix scramble resolving into text), **radar** (sonar sweep with contact blips), **helix** (a braille DNA double‑helix), **boot** (a holographic `SYSTEM ONLINE` sequence).
-- **Signatures:** **seth** (the author's 18‑second wizard‑battle signature, with a held *"created by SETH M. WOODBURY (github: SethWoodbury)"*), **credits** (the same epic reel but **customizable** — set `SIG_NAME`/`SIG_GH` to star *yourself*; it still credits the framework).
+- **Signatures:** **credits** — your own **customizable** 10‑second *showbiz hype reel*: mic check → drumroll → a flashing big‑name reveal → a gloriously silly title (*"THE G.O.A.T."*, *"RUBBER‑DUCK WHISPERER"*, …) → the crowd goes wild → a card crediting the framework. Set `SIG_NAME` to star yourself; until you do, it literally shows the placeholder **`David Baker <insert_your_name>`** so you know to swap it. (There's also a hidden 18‑second wizard‑battle reel, **seth**, kicking around for fun.)
 
 Don't want all of them? `bfc only …` / `bfc exclude …` (see above).
+
+## A full animation, start to finish (`computa`)
+
+A whole cameo end‑to‑end — `computa` as it actually plays in the bar (the wholesome word and the 2/3‑syllable word are random each run, and flash color as it holds):
+
+![computa animation](assets/computa.gif)
+
+Beat by beat (each holds ~1 second):
+
+![beep boop](assets/computa-1.svg)
+
+![new command](assets/computa-2.svg)
+
+![computing](assets/computa-3.svg)
+
+![the command](assets/computa-4.svg)
+
+![executed](assets/computa-5.svg)
+
+![wholesome finale](assets/computa-6.svg)
+
+Watch any of them live with `test-animations computa` (bar‑accurate) or `test-animations-fast computa` (smooth). The GIF was generated with `tools/make-gif.sh computa` (see `tools/` for the ANSI→SVG/PNG renderers).
 
 ## Debugging / authoring animations
 
@@ -145,7 +169,7 @@ test-animations --list                         # all animation names
 
 ## Make it yours
 
-- **Put your own name in it:** set `SIG_NAME` and `SIG_GH` in `statusline-animations.sh` (or export them) — the **`credits`** animation then stars *you* (and still credits the framework). The **`seth`** animation is the author's own signature.
+- **Put your own name in it:** set `SIG_NAME` (and optionally `SIG_GH`) in `statusline-animations.sh` (or export them) — the **`credits`** hype reel then stars *you* (and still credits the framework). It ships showing `David Baker <insert_your_name>`, so swap that whole string for your name.
 - **Pick your animations:** trim `ANIM_STYLES` in `statusline.sh` to just the ones you like (drop `seth`/`credits` if you don't want a signature reel).
 - **Recolor anything:** palettes and per‑style behavior live in `statusline-animations.sh`; the bar's own colors are in the `PALETTE` block of `statusline.sh`.
 

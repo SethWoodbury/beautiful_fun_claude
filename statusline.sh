@@ -72,10 +72,10 @@ ANIM_FRAMES=10          # steps per cameo. The bar repaints ~1×/sec, so this �
 # Or edit by hand — names must exist in statusline-animations.sh. Full set:
 #   rainbow nyan mouse ufo comet caterpillar fish train wave sparkle fireworks
 #   race fight chase party dance converge marquee abduct duel rocket
-#   pacman snake meteor llama bananapeel trex selfdestruct warp decrypt radar helix boot
-#   seth credits
+#   pacman snake meteor llama bananapeel trex selfdestruct computa
+#   warp decrypt radar helix boot  seth credits
 # ('credits' is the customizable signature — set SIG_NAME/SIG_GH; 'seth' is the author's.)
-ANIM_STYLES=(rainbow nyan mouse ufo comet caterpillar fish train wave sparkle fireworks race fight chase party dance converge marquee abduct duel rocket pacman snake meteor llama bananapeel trex selfdestruct warp decrypt radar helix boot seth credits)
+ANIM_STYLES=(rainbow nyan mouse ufo comet caterpillar fish train wave sparkle fireworks race fight chase party dance converge marquee abduct duel rocket pacman snake meteor llama bananapeel trex selfdestruct computa warp decrypt radar helix boot seth credits)
 ANIM_LIB="$HOME/.claude/statusline-animations.sh"   # shared animation library
 ANIM_MAXW=200           # cap animation width (≈ your normal bar width); raise/lower to taste
 # NOTE: the in-bar cameo needs "refreshInterval": 1 so frames advance ~1×/sec,
@@ -196,7 +196,7 @@ _animation() {
     now=$(date +%s)
     win=$(( now / ANIM_EVERY ))
     style="${ANIM_STYLES[$(( win % ${#ANIM_STYLES[@]} ))]}"
-    frames=$ANIM_FRAMES; { [ "$style" = seth ] || [ "$style" = credits ]; } && frames=18   # signature reels run longer (18s)
+    frames=$ANIM_FRAMES; [ "$style" = seth ] && frames=18   # the author's signature reel runs longer (18s); credits uses the default
     phase=$(( now % ANIM_EVERY ))
     [ "$phase" -lt "$frames" ] || return 0
     declare -F anim_frame >/dev/null 2>&1 || . "$ANIM_LIB" 2>/dev/null
