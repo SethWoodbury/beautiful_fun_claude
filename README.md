@@ -1,6 +1,6 @@
 # 🌈 beautiful fun claude (bfc)
 
-A gorgeous, ridiculous, **fun** status line for [Claude Code](https://code.claude.com/docs/en/statusline) — a calm, colorful info bar most of the time, with periodic full‑width **animated cameos** (a wizard battle, races with photo finishes and wipeouts, a hyperdrive jump, a matrix‑style decrypt, a llama spitting, a T‑rex who can't reach the snack, a self‑destruct that just says "jk", nyan‑cat, fireworks, and more — **36 in all**).
+A gorgeous, ridiculous, **fun** status line for [Claude Code](https://code.claude.com/docs/en/statusline) — a calm, colorful info bar most of the time, with periodic full‑width **animated cameos** (a wizard battle, races with photo finishes and wipeouts, a hyperdrive jump, a matrix‑style decrypt, a llama spitting, a T‑rex who can't reach the snack, a self‑destruct that just says "jk", a lightsaber duel, a Death Star, a flaming‑pink titration, nyan‑cat, fireworks, and more — **43 in all**).
 
 ![status bar](assets/statusbar.svg)
 
@@ -168,15 +168,18 @@ Everything lives in the **CONFIG** and **PALETTE** blocks at the top of `~/.clau
 
 Animation palettes and per‑style color/behavior live in `~/.claude/statusline-animations.sh`.
 
-## The animations (36)
+## The animations (43)
 
-`rainbow nyan mouse ufo comet caterpillar fish train wave sparkle fireworks race fight chase party dance converge marquee abduct duel rocket pacman snake meteor llama bananapeel trex selfdestruct computa warp decrypt radar helix boot seth credits`
+`rainbow nyan mouse ufo comet caterpillar fish train wave sparkle fireworks race fight chase party dance converge marquee abduct duel rocket pacman snake meteor llama bananapeel trex selfdestruct computa warp decrypt radar helix boot lightsaber deathstar yoda titrate flametest ribosome benzene seth credits`
 
 Highlights:
 
 - **Classics & action:** **race** (random lead changes, photo finishes, ~25% wipeouts), **fight** (random knockbacks + winner), **chase** (early/late catch or escape), **rocket** (`T-3→LIFTOFF` then orbit/RUD/abort), **mouse** (a 🐭 cheese‑heist with three endings), **pacman**, **snake**, **fireworks** (staggered multi‑burst), **meteor** (a 🚀 intercepts an incoming ☄ — deflect or impact).
 - **Silly:** **llama** (spit that sometimes boomerangs into its own face), **bananapeel** (glorious wipeout, rare dodge), **trex** (tiny arms, eternal near‑miss, or a 🦅 helps), **selfdestruct** (a 5…0 countdown that just says "…jk" — rarely an actual KABOOM), **computa** (a robot dutifully executing *"COMPUTA, MAKE THESE claude bfc USERS SUPA &lt;kind&gt; AND &lt;respectful&gt;"* — both words randomized).
-- **Sci‑fi / aesthetic:** **warp** (hyperdrive star‑streaks → JUMP), **decrypt** (matrix scramble resolving into text), **radar** (sonar sweep with contact blips), **helix** (a braille DNA double‑helix), **boot** (a holographic `SYSTEM ONLINE` sequence).
+- **Sci‑fi / aesthetic:** **warp** (hyperdrive star‑streaks → JUMP), **decrypt** (matrix scramble resolving into text), **radar** (sonar sweep → a ridiculous CONTACT: 🛸/🐙/🍕/"…nothing"), **helix** (a braille DNA double‑helix), **boot** (a holographic `SYSTEM ONLINE` sequence).
+- **Star Wars:** **lightsaber** (two blades clash, random winner, "NOOO!"), **deathstar** (superlaser charges → fires → BOOM, or "THAT'S NO MOON 🌝"), **yoda** (lifts the X‑wing out of the swamp — "do or do not").
+- **Chem & biochem:** **titrate** (clear → shocking‑pink ENDPOINT, or one drop too many → OVERSHOT 🍷), **flametest** ("Cu?… Ba?… it's just SODIUM 🧂"), **ribosome** (builds a rainbow protein → FOLDED!, or a STOP CODON gag), **benzene** (a benzene ring boogies → AROMATIC! 💅).
+- Many of the originals now have surprise payoffs too — **wave** (a 🏄 wipeout / 🦈 "dun‑dun…"), **ufo** (a ⚡ZAP⚡ abduction), **caterpillar** (🦋 TA‑DA!), **fish** ("…a BOOT?!"), **train** (🚇 …gone!), **comet** (💥 KABOOM!), **sparkle** (a 🌠 shooting star → make a wish).
 - **Signatures:** **credits** — your own **customizable** 14‑second *showbiz hype reel*: mic check → drumroll → a flashing big‑name reveal → a gloriously silly title that lingers (*"THE G.O.A.T."*, *"RUBBER‑DUCK WHISPERER"*, …) → the crowd goes wild → a card with your name + title + framework. Set `SIG_NAME` to star yourself; until you do, it literally shows the placeholder **`David Baker <insert_your_name>`** so you know to swap it. (There's also a hidden 18‑second wizard‑battle reel, **seth**, kicking around for fun.)
 
 Don't want all of them? `bfc only …` / `bfc exclude …` (see above).
