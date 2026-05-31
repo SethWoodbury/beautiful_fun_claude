@@ -520,19 +520,19 @@ anim_frame() {
                      elif [ "$fate" -eq 4 ]; then printf '🌑%s💨😎' "$(_cycle $(( span-6<0?0:span-6 )) '━' "$off" LASER_GRN)"
                      else local t=" THAT'S NO MOON " tl lp rp; tl=${#t}; lp=$(( (span-tl-2)/2 )); [ "$lp" -lt 0 ] && lp=0; rp=$(( span-tl-2-lp )); [ "$rp" -lt 0 ] && rp=0
                          printf '%s%s🌝%s' "$(_dots "$lp")" "$(_text "$t" "$off" ICE_GLACIER)" "$(_dots "$rp")"; fi ;;
-        yoda)        local res=$(( seed%5 ))                                                             # 🧎 Yoda (right, faces left) raises the X-wing from the Dagobah swamp
-                     if   [ "$pm" -lt 200 ]; then local mid; mid=$(( span-13 )); [ "$mid" -lt 0 ] && mid=0   # establishing shot: 🌳 swamp, sunk X-wing }=, Luke 🧍, Yoda 🧎
-                         printf '🌳%s}=%s🧍%s🧎' "$(_cycle 3 '≈' "$off" OCEAN_TEAL)" "$(_cycle "$mid" '≈' "$off" OCEAN_TEAL)" "$(_dots 2)"
+        yoda)        local res=$(( seed%5 ))                                                             # 🧎 Yoda (right, faces left) raises a big X-wing <==[X]==} from the swamp
+                     if   [ "$pm" -lt 200 ]; then                                                        # establishing shot: 🌳 swamp, sunk X-wing [X], Luke 🧍, Yoda 🧎
+                         printf '🌳%s[X]%s🧍 🧎' "$(_cycle 3 '≈' "$off" OCEAN_TEAL)" "$(_cycle $(( span-13<0?0:span-13 )) '≈' "$off" OCEAN_TEAL)"
                      elif [ "$pm" -lt 380 ]; then local t=' do or do not ' tl lp rp; tl=${#t}; [ $(( tl+7 )) -gt "$span" ] && { t="${t:0:$(( span-8>1?span-8:1 ))}…"; tl=${#t}; }; lp=$(( (span-tl-7)/2 )); [ "$lp" -lt 0 ] && lp=0; rp=$(( span-tl-7-lp )); [ "$rp" -lt 0 ] && rp=0
                          printf '🌳%s%s%s🧍 🧎' "$(_dots "$lp")" "$(_text "$t" "$off" ICE_GLACIER)" "$(_dots "$rp")"
-                     elif [ "$pm" -lt 620 ]; then local sh; sh=$(( 2 + (pm-380)*(span-12)/240 )); [ "$sh" -lt 2 ] && sh=2; [ "$sh" -gt $(( span-12 )) ] && sh=$(( span-12 )); [ "$sh" -lt 0 ] && sh=0   # lift on a Force shimmer
-                         printf '🌳%s}=>%s🧍 🧎' "$(_cycle "$sh" '‧' "$off" ICE_GLACIER)" "$(_dots $(( span-sh-10<0?0:span-sh-10 )))"
+                     elif [ "$pm" -lt 620 ]; then local sh; sh=$(( 2 + (pm-380)*(span-18)/240 )); [ "$sh" -lt 2 ] && sh=2; [ "$sh" -gt $(( span-16 )) ] && sh=$(( span-16 )); [ "$sh" -lt 0 ] && sh=0   # lift the big X-wing on a Force shimmer
+                         printf '🌳%s<==[X]==}%s🧍 🧎' "$(_cycle "$sh" '‧' "$off" ICE_GLACIER)" "$(_dots $(( span-sh-16<0?0:span-sh-16 )))"
                      elif [ "$pm" -lt 800 ]; then local t=' there is no try ' tl lp rp; tl=${#t}; [ $(( tl+7 )) -gt "$span" ] && { t="${t:0:$(( span-8>1?span-8:1 ))}…"; tl=${#t}; }; lp=$(( (span-tl-7)/2 )); [ "$lp" -lt 0 ] && lp=0; rp=$(( span-tl-7-lp )); [ "$rp" -lt 0 ] && rp=0
                          printf '✨%s%s%s🧍 🧎' "$(_dots "$lp")" "$(_text "$t" "$off" RACE_GOLD)" "$(_dots "$rp")"
-                     elif [ "$res" -lt 4 ]; then local t=' …WIZARD! ' tl lp rp; tl=${#t}; [ $(( tl+10 )) -gt "$span" ] && { t="${t:0:$(( span-11>1?span-11:1 ))}…"; tl=${#t}; }; lp=$(( (span-tl-10)/2 )); [ "$lp" -lt 0 ] && lp=0; rp=$(( span-tl-10-lp )); [ "$rp" -lt 0 ] && rp=0   # blastoff! Luke cheers 🙌
-                         printf '}=>💨%s%s%s🙌 🧎' "$(_dots "$lp")" "$(_text "$t" "$off" RACE_GOLD)" "$(_dots "$rp")"
-                     else local t=' …cannot be done ' tl lp rp; tl=${#t}; [ $(( tl+9 )) -gt "$span" ] && { t="${t:0:$(( span-10>1?span-10:1 ))}…"; tl=${#t}; }; lp=$(( (span-tl-9)/2 )); [ "$lp" -lt 0 ] && lp=0; rp=$(( span-tl-9-lp )); [ "$rp" -lt 0 ] && rp=0   # flop: sinks back 💦
-                         printf '💦}=%s%s%s🧍 🧎' "$(_dots "$lp")" "$(_text "$t" "$off" OCEAN_DUSK)" "$(_dots "$rp")"; fi ;;
+                     elif [ "$res" -lt 4 ]; then local t=' WIZARD! ' tl lp rp; tl=${#t}; [ $(( tl+12 )) -gt "$span" ] && { t="${t:0:$(( span-13>1?span-13:1 ))}…"; tl=${#t}; }; lp=$(( (span-tl-12)/2 )); [ "$lp" -lt 0 ] && lp=0; rp=$(( span-tl-12-lp )); [ "$rp" -lt 0 ] && rp=0   # blastoff! Luke 🧍 + R2D2 🤖 aboard
+                         printf '<=[🧍🤖]=}%s%s%s🧎' "$(_dots "$lp")" "$(_text "$t" "$off" RACE_GOLD)" "$(_dots "$rp")"
+                     else local t=' …cannot be done ' tl lp rp; tl=${#t}; [ $(( tl+10 )) -gt "$span" ] && { t="${t:0:$(( span-11>1?span-11:1 ))}…"; tl=${#t}; }; lp=$(( (span-tl-10)/2 )); [ "$lp" -lt 0 ] && lp=0; rp=$(( span-tl-10-lp )); [ "$rp" -lt 0 ] && rp=0   # flop: sinks back 💦
+                         printf '💦[X]%s%s%s🧍 🧎' "$(_dots "$lp")" "$(_text "$t" "$off" OCEAN_DUSK)" "$(_dots "$rp")"; fi ;;
         titrate)     local roll=$(( seed%8 )) out pn dmax                                                # 🧪 drip titrant -> pink deepens -> undershoot / just-right / over / WAY over
                      if   [ "$roll" -lt 2 ]; then out=0; pn=PH_PINK; dmax=2          # UNDERSHOOT — too little, stays pale
                      elif [ "$roll" -lt 5 ]; then out=1; pn=PH_PINK; dmax=5          # JUST RIGHT — faint permanent pink
