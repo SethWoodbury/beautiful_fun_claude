@@ -366,13 +366,13 @@ anim_frame() {
                          printf '%s%s%s%s' "$pose" "$(_dots "$lp")" "$(_text ' WHOOPSIE! ' "$off" FIRE_CLASSIC)" "$(_dots $(( span-lp-13<0?0:span-lp-13 )))"
                      else local lp=$(( (span-11)/2 )); [ "$lp" -lt 0 ] && lp=0
                          printf '🦘%s%s%s😎' "$(_dots "$lp")" "$(_text ' PHEW! ' "$off" BANANA)" "$(_dots $(( span-lp-11<0?0:span-lp-11 )))"; fi ;;
-        trex)        local hlp=$(( seed%3 )) food; food=$(_pick "$seed" '🍪' '🍩' '🥨' '🍖')    # 🦖 tiny arms can't quite reach the snack
+        trex)        local hlp=$(( seed%3 )) food; food=$(_pick "$seed" '🍪' '🍩' '🥨' '🍖')    # 🦖 (right, faces left) — tiny arms can't reach the snack on the left
                      local arm=$(( 1 + pm*4/1000 )); [ "$arm" -gt 5 ] && arm=5
-                     if   [ "$pm" -lt 850 ]; then printf '🦖%s·%s▔▔%s' "$(_cycle "$arm" '»' "$off" FIRE_EMBER)" "$food" "$(_dots $(( span-arm-7<0?0:span-arm-7 )))"
-                     elif [ "$hlp" -lt 2 ]; then local lp=$(( (span-15)/2 )); [ "$lp" -lt 0 ] && lp=0
-                         printf '🦖😤%s%s%s' "$(_dots "$lp")" "$(_text ' SO CLOSE! ' "$off" FIRE_CLASSIC)" "$(_dots $(( span-lp-15<0?0:span-lp-15 )))"
-                     else local lp=$(( (span-19)/2 )); [ "$lp" -lt 0 ] && lp=0
-                         printf '🦖😋🍪%s%s%s🦅' "$(_dots "$lp")" "$(_text ' TEAMWORK! ' "$off" RACE_GOLD)" "$(_dots $(( span-lp-19<0?0:span-lp-19 )))"; fi ;;
+                     if   [ "$pm" -lt 850 ]; then printf '%s▔▔%s%s%s🦖' "$(_dots $(( span-12<0?0:span-12 )))" "$food" "$(_dots $(( 6-arm )))" "$(_cycle "$arm" '«' "$off" FIRE_EMBER)"
+                     elif [ "$hlp" -lt 2 ]; then local lp rp; lp=$(( (span-19)/2 )); [ "$lp" -lt 0 ] && lp=0; rp=$(( span-19-lp )); [ "$rp" -lt 0 ] && rp=0
+                         printf '▔▔%s%s%s%s😤🦖' "$food" "$(_dots "$lp")" "$(_text ' SO CLOSE! ' "$off" FIRE_CLASSIC)" "$(_dots "$rp")"
+                     else local lp rp; lp=$(( (span-17)/2 )); [ "$lp" -lt 0 ] && lp=0; rp=$(( span-17-lp )); [ "$rp" -lt 0 ] && rp=0
+                         printf '🦅%s%s%s%s🦖' "$(_dots "$lp")" "$(_text ' TEAMWORK! ' "$off" RACE_GOLD)" "$(_dots "$rp")" "$food"; fi ;;
         selfdestruct) local forreal=$(( seed%6 ))                                          # 🚨 5..0 countdown that just says "...jk" (rarely: KABOOM)
                      if   [ "$pm" -lt 600 ]; then local num=$(( 5 - pm/110 )); [ "$num" -lt 0 ] && num=0
                          local na=$(( 1 + pm/220 )); [ "$na" -gt 3 ] && na=3; local body=" $num " bl; bl=${#body}
