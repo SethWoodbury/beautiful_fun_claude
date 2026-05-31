@@ -74,9 +74,10 @@ ANIM_FRAMES=10          # steps per cameo. The bar repaints ~1×/sec, so this �
 #   race fight chase party dance converge marquee abduct duel rocket
 #   pacman snake meteor llama bananapeel trex selfdestruct computa
 #   warp decrypt radar helix boot
-#   lightsaber deathstar yoda titrate flametest ribosome benzene  seth credits
+#   lightsaber deathstar yoda titrate flametest ribosome benzene
+#   r2d2 ironman dgoggins volcano dragon  seth credits
 # ('credits' is the customizable signature — set SIG_NAME/SIG_GH; 'seth' is the author's.)
-ANIM_STYLES=(rainbow nyan mouse ufo comet caterpillar fish train wave sparkle fireworks race fight chase party dance converge marquee abduct duel rocket pacman snake meteor llama bananapeel trex selfdestruct computa warp decrypt radar helix boot lightsaber deathstar yoda titrate flametest ribosome benzene seth credits)
+ANIM_STYLES=(rainbow nyan mouse ufo comet caterpillar fish train wave sparkle fireworks race fight chase party dance converge marquee abduct duel rocket pacman snake meteor llama bananapeel trex selfdestruct computa warp decrypt radar helix boot lightsaber deathstar yoda titrate flametest ribosome benzene r2d2 ironman dgoggins volcano dragon seth credits)
 ANIM_LIB="$HOME/.claude/statusline-animations.sh"   # shared animation library
 ANIM_MAXW=200           # cap animation width (≈ your normal bar width); raise/lower to taste
 # NOTE: the in-bar cameo needs "refreshInterval": 1 so frames advance ~1×/sec,
