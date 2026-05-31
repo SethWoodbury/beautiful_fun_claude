@@ -37,7 +37,11 @@ Colors are role‑based: grey = info, teal = your name, warm ramp = anything tha
 
 ## A full animation, start to finish (`computa`)
 
-A whole cameo end‑to‑end — `computa` as it actually plays in the bar (the wholesome word and the 2/3‑syllable word are random each run, and flash color as it holds):
+In context — your normal status bar, a cameo taking over for a few seconds, then back to the bar (exactly how it behaves live):
+
+![status bar, then computa cameo, then back to the bar](assets/computa-in-context.gif)
+
+And the cameo on its own — the wholesome word and the 2/3‑syllable word are random each run, and flash color as it holds:
 
 ![computa animation](assets/computa.gif)
 
