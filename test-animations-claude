@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+# test-animations-claude — simulate EXACTLY how animations render in the Claude
+# status bar (NOT the smooth `test-animations` player).
+#
+# The bar shows each cameo as only ANIM_FRAMES discrete frames (pm 0..1000),
+# ~1 second apart, at width min(COLUMNS, ANIM_MAXW). It reads those real values
+# from ~/.claude/statusline.sh so this matches your bar.
+#
+# Usage:
+#   test-animations-claude [style|all]      (default: all)
+#   SEED=7 test-animations-claude race      (pin a specific outcome)
+#   SIMW=180 test-animations-claude all     (force a width when piped)
+#
+# In a terminal : choppy 1s/frame loop = what you actually see in the bar.
+# Piped/captured: a per-frame report (pm, display width, OVERFLOW flag, frame),
+#                 so Claude can see exactly what you see and fix it.
+set -u
+LIB="$HOME/.claude/statusline-animations.sh"; SL="$HOME/.claude/statusline.sh"
+. "$LIB" 2>/dev/null || { echo "missing $LIB" >&2; exit 1; }
+
+ANIM_FRAMES=$(sed -n 's/^ANIM_FRAMES=\([0-9]\{1,\}\).*/\1/p' "$SL" 2>/dev/null | head -1); ANIM_FRAMES=${ANIM_FRAMES:-5}
+ANIM_MAXW=$(sed -n 's/^ANIM_MAXW=\([0-9]\{1,\}\).*/\1/p' "$SL" 2>/dev/null | head -1); ANIM_MAXW=${ANIM_MAXW:-180}
+eval "$(grep -m1 '^ANIM_STYLES=' "$SL" 2>/dev/null)"
+[ "${ANIM_STYLES+x}" = x ] && [ "${#ANIM_STYLES[@]}" -gt 0 ] || ANIM_STYLES=("${ALL_STYLES[@]}")
+export ANIM_MAXW
+
+arg="${1:-all}"
+if [ "$arg" = all ]; then seq_styles=("${ANIM_STYLES[@]}"); else seq_styles=("$arg"); fi
+
+if [ -t 1 ]; then width=${COLUMNS:-0}; [ "$width" -le 0 ] && width=$(tput cols 2>/dev/null || echo 100)
+else width=${SIMW:-$ANIM_MAXW}; fi
+[ "$width" -gt "$ANIM_MAXW" ] && width=$ANIM_MAXW
+
+# frames per style ('seth' runs longer, matching statusline.sh)
+frames_of() { [ "$1" = seth ] && echo 18 || echo "$ANIM_FRAMES"; }
+pm_of() { local fr=${2:-$ANIM_FRAMES}; [ "$fr" -gt 1 ] && echo $(( $1 * 1000 / (fr-1) )) || echo 0; }
+
+dispw() {  # display width (emoji=2), via python3 if present
+    python3 - "$1" 2>/dev/null <<'PY' || printf '?'
+import sys,unicodedata
+s=sys.argv[1]; w=0
+for ch in s:
+    o=ord(ch)
+    if unicodedata.east_asian_width(ch) in ('W','F') or 0x1F000<=o<=0x1FAFF or 0x2600<=o<=0x27BF or 0x1F300<=o<=0x1F9FF: w+=2
+    elif unicodedata.combining(ch) or 0xFE00<=o<=0xFE0F: w+=0
+    else: w+=1
+print(w)
+PY
+}
+
+if [ -t 1 ]; then
+    # Live: choppy, 1 second per frame — the true bar cadence.
+    printf '\e[?25l'; trap 'printf "\e[?25h\e[0m\n"' EXIT; trap 'exit 130' INT TERM
+    printf '\e[2m  bar sim — %d frames/cameo @ %d cols, ~1s/frame (Ctrl-C to stop)\e[0m\n' "$ANIM_FRAMES" "$width"
+    win=0
+    while :; do
+        for st in "${seq_styles[@]}"; do
+            ANIM_SEED=${SEED:-$win}; FR=$(frames_of "$st")
+            printf '\n  \e[1m%s\e[0m  \e[2m(seed=%s, %sf)\e[0m\n' "$st" "$ANIM_SEED" "$FR"
+            for ((f=0; f<FR; f++)); do
+                printf '\r\e[2K%s' "$(anim_frame "$st" "$(pm_of "$f" "$FR")" "$width")"
+                sleep 1
+            done
+            printf '\r\e[2K'
+            win=$(( win+1 ))
+        done
+    done
+else
+    # Captured: per-frame report so problems (overflow, blanks) are visible.
+    printf 'bar sim:  ANIM_FRAMES=%s  width=%s (cap %s)  styles=%s\n' "$ANIM_FRAMES" "$width" "$ANIM_MAXW" "${#seq_styles[@]}"
+    win=0
+    for st in "${seq_styles[@]}"; do
+        ANIM_SEED=${SEED:-$win}; FR=$(frames_of "$st")
+        printf '\n== %s (seed=%s, %sf) ==\n' "$st" "$ANIM_SEED" "$FR"
+        for ((f=0; f<FR; f++)); do
+            pm=$(pm_of "$f" "$FR")
+            frame="$(anim_frame "$st" "$pm" "$width")"
+            plain="$(printf '%s' "$frame" | sed 's/\x1b\[[0-9;]*m//g')"
+            dw="$(dispw "$plain")"; flag=''
+            [ "$dw" != '?' ] && [ "$dw" -gt "$width" ] 2>/dev/null && flag='  <<OVERFLOW'
+            [ -z "$plain" ] && flag='  <<BLANK'
+            printf '  f%d pm=%4d w=%3s%s |%s|\n' "$f" "$pm" "$dw" "$flag" "$plain"
+        done
+        win=$(( win+1 ))
+    done
+fi
