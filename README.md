@@ -16,6 +16,8 @@ Every ~20 seconds the whole bar briefly turns into a full‑width animation — 
 
 It runs **locally** and uses **zero API tokens / zero context** — it's just a shell script Claude Code pipes session JSON to.
 
+**▶ See them move (GIFs):** [a full cameo, start to finish (`computa`)](#a-full-animation-start-to-finish-computa) · [a gallery of cameos (warp, race, fight, duel…)](#a-few-more-cameos) — or skip ahead to [**installing it** (incl. a copy‑paste Claude prompt)](#install).
+
 ---
 
 ## What the bar shows
