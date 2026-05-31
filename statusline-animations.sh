@@ -76,7 +76,7 @@ _signature() {
     local NAME="$1" GH="$2" CREDIT="${3:-}" L=${#1} c=$(( span/2 )) fin=$(( seed%3 ))
     local band tl quip created
     band=$(_pick "$seed" "${SETHPALS[@]}")
-    tl=$(_pick "$seed" 'ships code' 'made this' 'builds proteins' 'fueled by happy hour' 'was here' 'commits at 2am' 'folds proteins @ IPD' 'high on life' 'designs diffusion-limited enzymes' 'relies on claude')
+    tl=$(_pick "$seed" 'ships code' 'made this' 'builds proteins' 'fueled by happy hour' 'was here' 'commits at 2am' 'folds proteins @ IPD' 'high on life' 'designs diffusion-limited enzymes' 'relies on claude' 'vibe codes')
     quip=$(_pick "$(( seed+1 ))" 'EN GARDE!' 'BEHOLD!' 'WITNESS ME!' 'KABOOM!' 'TA-DA!' 'ZAP! ZAP!')
     created="created by $NAME"; [ -n "$GH" ] && created="$created (github: $GH)"
     [ "$L" -gt "$span" ] && { NAME="${NAME:0:$(( span>1?span-1:1 ))}…"; L=${#NAME}; }   # narrow-bar guard
