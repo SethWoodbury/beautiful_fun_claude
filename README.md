@@ -1,17 +1,16 @@
 # 🌈 beautiful_fun_claude
 
-A gorgeous, ridiculous, **fun** status line for [Claude Code](https://code.claude.com/docs/en/statusline) — a calm, colorful info bar most of the time, with periodic full‑width **animated cameos** (a wizard battle, races with photo finishes and wipeouts, fights, a UFO abduction, a rocket launch, nyan‑cat, fireworks, and more — 22 in all).
+A gorgeous, ridiculous, **fun** status line for [Claude Code](https://code.claude.com/docs/en/statusline) — a calm, colorful info bar most of the time, with periodic full‑width **animated cameos** (a wizard battle, races with photo finishes and wipeouts, fights, a UFO abduction, a rocket launch, nyan‑cat, fireworks, and more — **23 in all**).
 
-```
-🐦 ─── [ligandmpnn_wrapper_cli]    📁 SethWoodbury/protein_chisel    Opus 4.8 1M·xhigh    ctx ▓▓▓▓░░ 67% · 670k/1M    ↑1903 ↓382    ◷ May 30 2:47p    5h 10% → 12:40a · 7d 11%    · small diffs win ───
-```
+![status bar](assets/statusbar.svg)
 
-Every few cameos, the whole bar briefly becomes something like:
+Every ~20 seconds the whole bar briefly turns into a full‑width animation — a race finish, the signature wizard battle, and 20+ more:
 
-```
-🏁 🏆WIN! 🏎️━━🚗💨━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🧙══════════════💥💥💥══════════════🧙        ✦ CREATED BY SETH M. WOODBURY ✦
-```
+![race finish](assets/race.svg)
+
+![seth signature](assets/seth.svg)
+
+<sub>(GitHub can't show ANSI color in a code block, so these are SVG snapshots of real output — on your machine the colors are live and the cameos animate.)</sub>
 
 It runs **locally** and uses **zero API tokens / zero context** — it's just a shell script Claude Code pipes session JSON to.
 
@@ -42,6 +41,8 @@ Colors are role‑based: grey = info, teal = your name, warm ramp = anything tha
 - A terminal with **256‑color** support (almost all modern ones)
 - *Optional:* a `claude-limit` CLI on `PATH` enables a rate‑limit‑recovery hint (auto‑hidden if absent)
 
+> **macOS:** the system `bash` is 3.2 — too old (the scripts use bash‑4 namerefs/`readarray`). Install a modern one: `brew install bash` (and ensure it's used). `jq`: `brew install jq`.
+
 ## Install
 
 ```bash
@@ -63,17 +64,18 @@ cd beautiful_fun_claude
 Changes appear on your next interaction with Claude Code. Then:
 
 ```bash
-test-animations          # smooth full reel of all animations
-test-animations seth     # just one (run a few times — they're randomized)
-test-animations loop      # play forever (nice in a tmux split)
+test-animations            # preview the animations exactly as the bar shows them
+test-animations seth        # just one (run a few times — they're randomized)
+test-animations --list      # all animation names    (--help for usage)
+test-animations-fast         # smooth, full-fps preview  (test-animations-fast loop = run forever)
 ```
 
-### 🤖 Install via someone else's Claude (copy‑paste prompt)
+### 🤖 Install with Claude (copy‑paste prompt)
 
 Paste this into a Claude Code session and it'll do the whole install:
 
 > Please install the **beautiful_fun_claude** Claude Code status line for me from `https://github.com/SethWoodbury/beautiful_fun_claude`.
-> Steps: (1) make sure `jq` is installed (it's required); (2) `git clone` that repo to a temp dir and run its `./install.sh` — which copies `statusline.sh` and `statusline-animations.sh` into `~/.claude/`, copies `test-animations` and `test-animations-claude` into `~/.local/bin/`, makes them executable, and **merges** (does not overwrite) this into my `~/.claude/settings.json`: `"statusLine": {"type":"command","command":"~/.claude/statusline.sh","refreshInterval":1}`; (3) confirm `~/.local/bin` is on my `PATH`; (4) tell me to run `test-animations` in a terminal to see the reel, and that the status bar updates on my next message. Note: `refreshInterval:1` repaints the bar every second so the occasional animation cameos can move — mention I can set it to 60 (no cameo motion) or set `ANIM_ENABLED=0` in `~/.claude/statusline.sh` to disable cameos. Don't change any other settings of mine.
+> Steps: (1) make sure `jq` is installed (it's required); (2) `git clone` that repo to a temp dir and run its `./install.sh` — which copies `statusline.sh` and `statusline-animations.sh` into `~/.claude/`, copies the `test-animations` and `test-animations-fast` preview tools into `~/.local/bin/`, makes them executable, and **merges** (does not overwrite) this into my `~/.claude/settings.json`: `"statusLine": {"type":"command","command":"~/.claude/statusline.sh","refreshInterval":1}`; (3) confirm `~/.local/bin` is on my `PATH`; (4) tell me to run `test-animations` in a terminal to preview, and that the status bar updates on my next message. Note: `refreshInterval:1` repaints the bar every second so the occasional animation cameos can move — mention I can set it to 60 (no cameo motion) or set `ANIM_ENABLED=0` in `~/.claude/statusline.sh` to disable cameos. Optionally I can set `SIG_NAME`/`SIG_GH` in `~/.claude/statusline-animations.sh` to put my own name in the `credits` animation. Don't change any other settings of mine.
 
 ## Configuration
 
@@ -85,33 +87,50 @@ Everything lives in the **CONFIG** and **PALETTE** blocks at the top of `~/.clau
 | `ANIM_EVERY` | `20` | Seconds between cameos (a cameo plays once per window). |
 | `ANIM_FRAMES` | `10` | Length of a cameo in ~1s frames (`seth` overrides to 18s). |
 | `ANIM_MAXW` | `200` | Max animation width (≈ your bar width). |
-| `ANIM_STYLES=(…)` | all 22 | Which animations rotate; trim to your favorites. |
+| `ANIM_STYLES=(…)` | all 23 | Which animations rotate; trim to your favorites. |
 | `SHOW_DECO` | `1` | The `───` end‑caps. |
 | `SHOW_MASCOT`/`SHOW_QUIP`/`SHOW_DIR`/`SHOW_SEVEN_DAY`/… | `1` | Per‑segment toggles. |
 | `TZ_OVERRIDE` | `""` | Pin a timezone (default = system local). |
 | `EMOJI`/`QUIPS`/`DECO` | — | The mascot pool, quip list, end‑cap gradient. |
+| `SIG_NAME`/`SIG_GH` | — | **Your** name + GitHub handle for the customizable `credits` animation (in `statusline-animations.sh`). |
 
 Animation palettes and per‑style color/behavior live in `~/.claude/statusline-animations.sh`.
 
-## The animations (22)
+## The animations (23)
 
-`rainbow nyan mouse ufo comet caterpillar fish train wave sparkle fireworks race fight chase party dance converge marquee abduct duel rocket seth`
+`rainbow nyan mouse ufo comet caterpillar fish train wave sparkle fireworks race fight chase party dance converge marquee abduct duel rocket seth credits`
 
-Highlights: **race** (random lead changes, photo finishes, ~25% wipeouts), **fight** (random knockbacks + winner), **chase** (random early/late catch or escape), **rocket** (`T-3→LIFTOFF` then orbit/RUD/abort), **seth** (an 18‑second wizard‑battle signature — see below).
+Highlights: **race** (random lead changes, photo finishes, ~25% wipeouts), **fight** (random knockbacks + winner), **chase** (random early/late catch or escape), **rocket** (`T-3→LIFTOFF` then orbit/RUD/abort), **seth** (the author's 18‑second wizard‑battle signature), **credits** (the same epic reel but **customizable** — set `SIG_NAME`/`SIG_GH` to put your own name in it; it still credits the framework).
 
 ## Debugging / authoring animations
 
-`test-animations` plays *smoothly*, but the Claude bar only repaints ~once a second, so it shows each cameo as a handful of discrete frames. To see **exactly** what the bar shows (and catch overflow):
+Two previewers:
 
 ```bash
-test-animations-claude            # bar-accurate sim of every animation
-test-animations-claude race        # one style (choppy, 1s/frame, like the bar)
-SEED=7 SIMW=200 test-animations-claude seth   # pin outcome + width; piped output prints a per-frame width/overflow report
+test-animations [style]       # BAR-ACCURATE: exactly what the bar shows (choppy ~1s/frame)
+test-animations-fast [style]  # SMOOTH: full-fps preview (test-animations-fast loop = run forever)
+```
+
+`test-animations` mirrors the bar's discrete‑frame reality and, when piped/captured, prints a per‑frame **width + OVERFLOW/BLANK** report — handy when authoring a new animation:
+
+```bash
+SEED=7 SIMW=200 test-animations seth | less   # pin a random outcome + width
+test-animations --list                         # all animation names
 ```
 
 ## Make it yours
 
-The **`seth`** animation is a personal signature ("SETH M. WOODBURY"). To rename or remove it: edit the `seth)` case in `statusline-animations.sh` (the `NAME`/taglines), or just drop `seth` from `ANIM_STYLES` in `statusline.sh`. Same goes for any animation you don't want — trim the `ANIM_STYLES` list.
+- **Put your own name in it:** set `SIG_NAME` and `SIG_GH` in `statusline-animations.sh` (or export them) — the **`credits`** animation then stars *you* (and still credits the framework). The **`seth`** animation is the author's own signature.
+- **Pick your animations:** trim `ANIM_STYLES` in `statusline.sh` to just the ones you like (drop `seth`/`credits` if you don't want a signature reel).
+- **Recolor anything:** palettes and per‑style behavior live in `statusline-animations.sh`; the bar's own colors are in the `PALETTE` block of `statusline.sh`.
+
+## Updating · Uninstalling · Troubleshooting
+
+- **Update:** `git pull && ./install.sh` (re‑run‑safe; it re‑backs‑up `settings.json`).
+- **Uninstall:** remove `~/.claude/statusline.sh`, `~/.claude/statusline-animations.sh`, and `~/.local/bin/test-animations{,-fast}`; delete the `statusLine` key from `~/.claude/settings.json` (or restore the `settings.json.bak.<timestamp>` the installer saved).
+- **Bar is blank?** `~/.local/bin` isn't on your `PATH`, or `jq` isn't installed.
+- **Cameos don't move?** `refreshInterval` isn't `1` in `settings.json` (a higher value means the bar repaints too rarely to animate).
+- **Colors look off?** Your terminal may not support 256‑color, or it's overriding the palette via a theme.
 
 ## License
 

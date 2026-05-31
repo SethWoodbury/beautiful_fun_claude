@@ -18,9 +18,9 @@ cp "$here/statusline-animations.sh" "$CLAUDE/statusline-animations.sh"
 chmod +x "$CLAUDE/statusline.sh" "$CLAUDE/statusline-animations.sh"
 
 echo "→ installing preview tools to $BIN"
-cp "$here/test-animations"        "$BIN/test-animations"
-cp "$here/test-animations-claude" "$BIN/test-animations-claude"
-chmod +x "$BIN/test-animations" "$BIN/test-animations-claude"
+cp "$here/test-animations"      "$BIN/test-animations"
+cp "$here/test-animations-fast" "$BIN/test-animations-fast"
+chmod +x "$BIN/test-animations" "$BIN/test-animations-fast"
 
 SETTINGS="$CLAUDE/settings.json"
 if command -v jq >/dev/null 2>&1; then

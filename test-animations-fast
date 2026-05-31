@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# test-animations-fast — smooth, full-fps preview. Usage: test-animations-fast [style|all|loop|--list|--help]
+# (Bar-accurate "what you actually see" version: test-animations)
+exec bash "$HOME/.claude/statusline-animations.sh" "$@"
