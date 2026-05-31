@@ -352,11 +352,11 @@ anim_frame() {
                      elif [ "$pm" -lt 1000 ]; then printf '🌍%s🚀☄%s' "$(_dots $(( mcol-2<0?0:mcol-2 )))" "$(_dots $(( span-mcol-4<0?0:span-mcol-4 )))"
                      elif [ "$save" -lt 2 ]; then printf '🌍%s🛡✨' "$(_dots $(( span-6<0?0:span-6 )))"
                      else printf '💥🌍🔥%s' "$(_cycle $(( span-6<0?0:span-6 )) '▒' "$off" FIRE_EMBER)"; fi ;;
-        llama)       local out=$(( seed%3 )) vic; vic=$(_pick "$seed" '🧍' '🐑' '🤠' '🌵')   # 🦙 hocks a wad of spit at a victim
-                     local sp=$(( 2 + pm*(span-6)/1000 ))
-                     if   [ "$pm" -lt 1000 ]; then printf '🦙%s%s%s%s' "$(_dots $(( sp-2<0?0:sp-2 )))" "$(_cycle 1 '~' "$off" SPIT)" "$(_dots $(( span-sp-3<0?0:span-sp-3 )))" "$vic"
-                     elif [ "$out" -lt 2 ]; then printf '🦙%s💦😵' "$(_dots $(( span-6<0?0:span-6 )))"
-                     else printf '🤮%s😏' "$(_dots $(( span-4<0?0:span-4 )))"; fi ;;
+        llama)       local out=$(( seed%3 )) vic; vic=$(_pick "$seed" '🧍' '🐑' '🤠' '🌵')   # 🦙 (right, faces left) spits leftward at a victim (left)
+                     local sp; sp=$(( (span-4) - pm*(span-7)/1000 )); [ "$sp" -lt 3 ] && sp=3; [ "$sp" -gt $(( span-4 )) ] && sp=$(( span-4 ))
+                     if   [ "$pm" -lt 1000 ]; then printf '%s%s%s%s🦙' "$vic" "$(_dots $(( sp-2<0?0:sp-2 )))" "$(_cycle 1 '~' "$off" SPIT)" "$(_dots $(( span-sp-3<0?0:span-sp-3 )))"
+                     elif [ "$out" -lt 2 ]; then printf '😵💦%s🦙' "$(_dots $(( span-6<0?0:span-6 )))"      # SPLAT — victim hit
+                     else printf '😏%s🤮' "$(_dots $(( span-4<0?0:span-4 )))"; fi ;;                       # MISS — boomerangs into its own face
         bananapeel)  local fate=$(( seed%4 )) pose; pose=$(_pick "$seed" '🤕' '😵' '💫')      # 🚶 + 🍌 -> glorious wipeout (or rare dodge)
                      local bx=$(( span*2/3 )) wp; wp=$(( pm*(bx-2)/555 )); [ "$wp" -gt $(( bx-2 )) ] && wp=$(( bx-2 )); [ "$wp" -lt 0 ] && wp=0
                      if   [ "$pm" -lt 555 ]; then printf '%s🚶%s🍌%s' "$(_dots "$wp")" "$(_dots $(( bx-wp-2<0?0:bx-wp-2 )))" "$(_dots $(( span-bx-2<0?0:span-bx-2 )))"

@@ -3,7 +3,8 @@
 # back to the bar (assets/computa-in-context.gif). Uses a representative mock
 # session + a slightly trimmed bar (so it's narrow enough to read on GitHub).
 # Needs: python3 + Pillow + a color-emoji font + ImageMagick `convert`.
-set -euo pipefail
+# NB: no `set -e` — the animation lib's `((i++))` slot-skip returns 1 when i==0.
+set -uo pipefail
 cd "$(dirname "$0")/.."
 . ./statusline-animations.sh
 SEED="${1:-111}"

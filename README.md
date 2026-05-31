@@ -61,6 +61,30 @@ Beat by beat (each holds ~1 second):
 
 Watch any of them live with `test-animations computa` (bar‑accurate) or `test-animations-fast computa` (smooth). The GIF was generated with `tools/make-gif.sh computa` (see `tools/` for the ANSI→SVG/PNG renderers).
 
+## A few more cameos
+
+A handful of the showier ones — all randomized, so outcomes vary every run:
+
+**`warp`** — a hyperdrive jump
+
+![warp](assets/warp.gif)
+
+**`duel`** — a high‑noon standoff (sometimes a double K.O.)
+
+![duel](assets/duel.gif)
+
+**`race`** — two racers: lead changes, photo finishes, the occasional wipeout
+
+![race](assets/race.gif)
+
+**`fight`** — a brawl that ends in a random K.O.
+
+![fight](assets/fight.gif)
+
+**`seth`** — a hidden wizard‑battle reel
+
+![seth](assets/seth.gif)
+
 ## Dependencies
 
 - **bash 4+**

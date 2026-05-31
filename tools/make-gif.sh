@@ -3,7 +3,9 @@
 #   tools/make-gif.sh [style] [seed] [width]
 # Needs: python3 + Pillow, a color-emoji font (Segoe UI Emoji / Noto Color Emoji),
 #        ImageMagick `convert`. Frames -> PNG (tools/ansi2png.py) -> optimized GIF.
-set -euo pipefail
+# NB: no `set -e` — the animation lib uses the idiomatic `((i++))` slot-skip, which
+# returns exit status 1 when i==0 (post-increment yields 0) and would abort under -e.
+set -uo pipefail
 cd "$(dirname "$0")/.."
 . ./statusline-animations.sh
 STYLE="${1:-computa}"; SEED="${2:-111}"; W="${3:-80}"
