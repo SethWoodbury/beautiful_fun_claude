@@ -1,4 +1,4 @@
-# 🌈 beautiful_fun_claude
+# 🌈 beautiful fun claude (bfc)
 
 A gorgeous, ridiculous, **fun** status line for [Claude Code](https://code.claude.com/docs/en/statusline) — a calm, colorful info bar most of the time, with periodic full‑width **animated cameos** (a wizard battle, races with photo finishes and wipeouts, a hyperdrive jump, a matrix‑style decrypt, a llama spitting, a T‑rex who can't reach the snack, a self‑destruct that just says "jk", nyan‑cat, fireworks, and more — **36 in all**).
 
@@ -34,6 +34,28 @@ It runs **locally** and uses **zero API tokens / zero context** — it's just a 
 | `· small diffs win` | A rotating quip. |
 
 Colors are role‑based: grey = info, teal = your name, warm ramp = anything that "fills up."
+
+## A full animation, start to finish (`computa`)
+
+A whole cameo end‑to‑end — `computa` as it actually plays in the bar (the wholesome word and the 2/3‑syllable word are random each run, and flash color as it holds):
+
+![computa animation](assets/computa.gif)
+
+Beat by beat (each holds ~1 second):
+
+![beep boop](assets/computa-1.svg)
+
+![new command](assets/computa-2.svg)
+
+![computing](assets/computa-3.svg)
+
+![the command](assets/computa-4.svg)
+
+![executed](assets/computa-5.svg)
+
+![wholesome finale](assets/computa-6.svg)
+
+Watch any of them live with `test-animations computa` (bar‑accurate) or `test-animations-fast computa` (smooth). The GIF was generated with `tools/make-gif.sh computa` (see `tools/` for the ANSI→SVG/PNG renderers).
 
 ## Dependencies
 
@@ -128,28 +150,6 @@ Highlights:
 - **Signatures:** **credits** — your own **customizable** 14‑second *showbiz hype reel*: mic check → drumroll → a flashing big‑name reveal → a gloriously silly title that lingers (*"THE G.O.A.T."*, *"RUBBER‑DUCK WHISPERER"*, …) → the crowd goes wild → a card with your name + title + framework. Set `SIG_NAME` to star yourself; until you do, it literally shows the placeholder **`David Baker <insert_your_name>`** so you know to swap it. (There's also a hidden 18‑second wizard‑battle reel, **seth**, kicking around for fun.)
 
 Don't want all of them? `bfc only …` / `bfc exclude …` (see above).
-
-## A full animation, start to finish (`computa`)
-
-A whole cameo end‑to‑end — `computa` as it actually plays in the bar (the wholesome word and the 2/3‑syllable word are random each run, and flash color as it holds):
-
-![computa animation](assets/computa.gif)
-
-Beat by beat (each holds ~1 second):
-
-![beep boop](assets/computa-1.svg)
-
-![new command](assets/computa-2.svg)
-
-![computing](assets/computa-3.svg)
-
-![the command](assets/computa-4.svg)
-
-![executed](assets/computa-5.svg)
-
-![wholesome finale](assets/computa-6.svg)
-
-Watch any of them live with `test-animations computa` (bar‑accurate) or `test-animations-fast computa` (smooth). The GIF was generated with `tools/make-gif.sh computa` (see `tools/` for the ANSI→SVG/PNG renderers).
 
 ## Debugging / authoring animations
 
