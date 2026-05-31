@@ -67,12 +67,15 @@ ANIM_ENABLED=1          # 1 = occasional in-bar cameo; 0 = off
 ANIM_EVERY=20           # period in seconds (a cameo plays once per window)
 ANIM_FRAMES=10          # steps per cameo. The bar repaints ~1×/sec, so this ≈ seconds
                         # of cameo. More = smoother (more in-between frames); fewer = snappier.
-# Which animations rotate through the bar (one per window, cycling). Add/remove
-# freely; names must exist in statusline-animations.sh. Full set:
+# Which animations rotate through the bar (one per window, cycling). Easiest way
+# to change this: the `bfc` command (bfc off | only … | exclude … | every N).
+# Or edit by hand — names must exist in statusline-animations.sh. Full set:
 #   rainbow nyan mouse ufo comet caterpillar fish train wave sparkle fireworks
-#   race fight chase party dance converge marquee abduct duel rocket seth credits
+#   race fight chase party dance converge marquee abduct duel rocket
+#   pacman snake meteor llama bananapeel trex selfdestruct warp decrypt radar helix boot
+#   seth credits
 # ('credits' is the customizable signature — set SIG_NAME/SIG_GH; 'seth' is the author's.)
-ANIM_STYLES=(rainbow nyan mouse ufo comet caterpillar fish train wave sparkle fireworks race fight chase party dance converge marquee abduct duel rocket seth credits)
+ANIM_STYLES=(rainbow nyan mouse ufo comet caterpillar fish train wave sparkle fireworks race fight chase party dance converge marquee abduct duel rocket pacman snake meteor llama bananapeel trex selfdestruct warp decrypt radar helix boot seth credits)
 ANIM_LIB="$HOME/.claude/statusline-animations.sh"   # shared animation library
 ANIM_MAXW=200           # cap animation width (≈ your normal bar width); raise/lower to taste
 # NOTE: the in-bar cameo needs "refreshInterval": 1 so frames advance ~1×/sec,

@@ -15,7 +15,10 @@
 # =============================================================================
 
 ALL_STYLES=(rainbow nyan mouse ufo comet caterpillar fish train wave sparkle \
-            fireworks race fight chase party dance converge marquee abduct duel rocket seth credits)
+            fireworks race fight chase party dance converge marquee abduct duel rocket \
+            pacman snake meteor llama bananapeel trex selfdestruct \
+            warp decrypt radar helix boot \
+            seth credits)
 
 R=$'\e[0m'
 # --- palettes (256-color, bright head -> dark tail; head-safe on black) ------
@@ -30,6 +33,17 @@ SMOKE=(253 251 249 246 243 240 238 236)
 ELECTRIC=(231 230 226 190 154 87 51 45 39 33)        # white→yellow→cyan→blue (lightning)
 FLASH=(196 202 226 46 51 21 93 201 213 231)          # vivid strobe (intense flashing)
 SETHPALS=(RING DISCO_NEON DISCO_CANDY DISCO_VAPOR FIRE_VIOLET ICE_GLACIER OCEAN_SURF FIRE_CLASSIC)
+# --- extra palettes for the newer animations -------------------------------
+MOUSE_DUST=(223 222 180 144 138 102 101 240)         # warm dust kicked up by the mouse
+PAC_MAZE=(226 220 214 190 184 178)                   # pellet gold
+SNAKE_GRN=(46 40 34 28 22 22)                         # bright head -> dark tail
+SPIT=(231 230 194 154 120 84 70)                      # llama goo: white -> sickly green
+BANANA=(231 229 226 220 214 178)                      # banana yellow
+HUD_CYAN=(231 159 123 87 51 45 39 38 37 31)           # white -> ice -> cyan HUD glow
+MATRIX=(231 194 157 120 83 46 40 34 28 22)            # white head -> deep matrix green
+PLASMA=(231 219 213 207 171 135 99 63 57 93)          # white -> magenta -> indigo
+RADAR_GRN=(231 195 157 119 83 46 40 34 28 22)         # sweep: bright edge -> fading trail
+WARP_BLU=(231 195 159 153 117 111 75 69 63 27)        # white-hot -> blue-shift streaks
 # --- customize the `credits` animation with YOUR name/handle (env-overridable) ---
 SIG_NAME="${SIG_NAME:-YOUR NAME}"; SIG_GH="${SIG_GH:-your-handle}"
 NR=${#RING[@]}
@@ -64,7 +78,7 @@ _signature() {
     band=$(_pick "$seed" "${SETHPALS[@]}")
     tl=$(_pick "$seed" 'ships code' 'made this' 'builds proteins' 'fueled by happy hour' 'was here' 'commits at 2am' 'folds proteins @ IPD' 'high on life' 'designs diffusion-limited enzymes' 'relies on claude')
     quip=$(_pick "$(( seed+1 ))" 'EN GARDE!' 'BEHOLD!' 'WITNESS ME!' 'KABOOM!' 'TA-DA!' 'ZAP! ZAP!')
-    created="CREATED BY $NAME"; [ -n "$GH" ] && created="$created (github: $GH)"
+    created="created by $NAME"; [ -n "$GH" ] && created="$created (github: $GH)"
     [ "$L" -gt "$span" ] && { NAME="${NAME:0:$(( span>1?span-1:1 ))}…"; L=${#NAME}; }   # narrow-bar guard
     if   [ "$pm" -lt 100 ]; then local q=" ⚡ $quip ⚡ " qw sh; qw=$(( ${#q}+2 )); sh=$(( (span-qw-4)/2 )); [ "$sh" -lt 0 ] && sh=0       # ⚔ wizards square up
         printf '🧙%s%s%s🧙' "$(_dots "$sh")" "$(_text "$q" "$off" "$band")" "$(_dots $(( span-qw-4-sh<0?0:span-qw-4-sh )))"
@@ -101,9 +115,30 @@ anim_frame() {
     local pos=$(( pm*span/1000 )) i
 
     case "$style" in
-        rainbow)     _cycle $(( w-2 )) '█' "$off" RING ;;
-        nyan)        _runner "$pos" 2 "$w" '🐱' ltr "$off" '█' RING cycle ;;
-        mouse)       _runner "$pos" 2 "$w" '🐭' ltr "$off" '·' SMOKE fade ;;
+        rainbow)     local s='' n=$(( w-2 )) sweep; sweep=$(( pm*(n-1)/1000 ))      # rainbow + a bright white shimmer sweeping across
+                     for ((i=0;i<n;i++)); do local dd=$(( i-sweep )); [ "$dd" -lt 0 ] && dd=$(( -dd ))
+                         if [ "$dd" -le 1 ]; then s+=$'\e[1;38;5;231m''█'; else s+=$'\e[38;5;'"${RING[$(( (i+off)%NR ))]}"m'█'; fi; done
+                     printf '%s%s' "$s" "$R" ;;
+        nyan)        local s='' tn=$pos                                              # 🐱 + rainbow stripe trail with ⭐ sparkles
+                     [ "$tn" -gt $(( span-2 )) ] && tn=$(( span-2 )); [ "$tn" -lt 0 ] && tn=0
+                     for ((i=0;i<tn;i++)); do
+                         if [ "$i" -lt $(( tn-1 )) ] && [ $(( (i+off)%7 )) -eq 0 ]; then s+=$'\e[1;38;5;231m''⭐'; ((i++))
+                         else s+=$'\e[38;5;'"${RING[$(( (i+off)%NR ))]}"m'▬'; fi; done
+                     printf '%s%s🐱%s' "$s" "$R" "$(_dots $(( span-tn-2<0?0:span-tn-2 )))" ;;
+        mouse)       local out=$(( seed%3 )) ms=$pos cz=$(( span-3 ))                 # 🐭 sprints after 🧀 — heist (catch / cat-steal / escape)
+                     [ "$ms" -gt $(( cz-2 )) ] && ms=$(( cz-2 )); [ "$ms" -lt 0 ] && ms=0
+                     if   [ "$pm" -lt 888 ]; then
+                         printf '%s🐭%s🧀%s' "$(_fade "$ms" '·' MOUSE_DUST R)" "$(_dots $(( cz-ms-2<0?0:cz-ms-2 )))" "$(_dots $(( span-cz-2<0?0:span-cz-2 )))"
+                     elif [ "$pm" -lt 1000 ]; then
+                         case "$out" in
+                           1) printf '%s🐭💢🐱🧀%s' "$(_dots $(( cz-6<0?0:cz-6 )))" "$(_dots $(( span-cz-2<0?0:span-cz-2 )))" ;;
+                           *) printf '%s🐭🧀%s' "$(_fade $(( cz-2<0?0:cz-2 )) '·' MOUSE_DUST R)" "$(_dots $(( span-cz-2<0?0:span-cz-2 )))" ;;
+                         esac
+                     else case "$out" in
+                           0) printf '%s🐭🧀😋%s' "$(_dots $(( cz-2<0?0:cz-2 )))" "$(_dots $(( span-cz-4<0?0:span-cz-4 )))" ;;
+                           1) printf '💨🐭%s🐱😼🧀%s' "$(_dots $(( cz-6<0?0:cz-6 )))" "$(_dots $(( span-cz-6<0?0:span-cz-6 )))" ;;
+                           *) printf '💨🐭%s🐱💢🧀%s' "$(_dots $(( cz-6<0?0:cz-6 )))" "$(_dots $(( span-cz-6<0?0:span-cz-6 )))" ;;
+                         esac; fi ;;
         ufo)         _runner "$pos" 2 "$w" '🛸' ltr "$off" '=' TOX_NEON cycle ;;
         comet)       _runner $(( span-pos )) 2 "$w" '☄' rtl "$off" '─' "$(_pick "$seed" ICE_GLACIER ICE_FROSTFIRE)" fade ;;
         caterpillar) _runner $(( span-pos )) 2 "$w" '🐛' rtl "$off" '●' "$(_pick "$seed" FOREST_DEEP TOX_NEON)" cycle ;;
@@ -123,9 +158,18 @@ anim_frame() {
                          elif [ $(( (i*3+hot)%23 )) -eq 0 ]; then s+=$'\e[38;5;'"$br"m'·'
                          else s+=$'\e[38;5;236m''·'; fi; done
                      printf '%s%s' "$s" "$R" ;;
-        fireworks)   local c=$(( (w-2)/2 )); local ray=$(( pm*(c-2)/1000 )); local fp; fp="$(_pick "$seed" FIRE_CLASSIC FIRE_EMBER FIRE_VIOLET)"
-                     if [ "$pm" -lt 120 ]; then printf '%s\e[38;5;245m.%s' "$(_dots "$c")" "$R"
-                     elif [ "$pm" -lt 900 ]; then printf '%s\e[1;38;5;231m💥%s%s' "$(_cycle "$ray" '─' "$off" "$fp")" "$R" "$(_cycle "$ray" '─' $((off+5)) "$fp")"
+        fireworks)   local c=$(( (w-2)/2 )); local fp; fp="$(_pick "$seed" FIRE_CLASSIC FIRE_EMBER FIRE_VIOLET)"
+                     if [ "$pm" -lt 120 ]; then printf '%s\e[38;5;245m.%s' "$(_dots "$c")" "$R"   # a lone fuse climbing
+                     elif [ "$pm" -lt 900 ]; then local s='' n=$(( w-2 )) j; local -n FP="$fp"; local fm=${#FP[@]}   # three staggered bursts + glowing debris
+                         local cen=( $(( n/5 )) $(( n/2 )) $(( 4*n/5 )) ) ign=( 120 360 600 )
+                         for ((i=0;i<n;i++)); do local ch='' boom=0
+                             for j in 0 1 2; do [ "$pm" -lt "${ign[$j]}" ] && continue
+                                 local r=$(( (pm-${ign[$j]})*(n/5)/430 )); [ "$r" -lt 0 ] && r=0
+                                 local ctr=${cen[$j]} dd; dd=$(( i-ctr )); [ "$dd" -lt 0 ] && dd=$(( -dd ))
+                                 if   [ "$dd" -eq 0 ]; then ch=$'\e[1;38;5;231m''💥'; boom=1; break
+                                 elif [ "$dd" -le "$r" ]; then ch=$'\e[38;5;'"${FP[$(( (dd+off)%fm ))]}"m'─'; fi; done
+                             if [ -n "$ch" ]; then s+="$ch"; [ "$boom" -eq 1 ] && ((i++)); else s+=$'\e[38;5;236m''·'; fi; done
+                         printf '%s%s' "$s" "$R"
                      else printf '%s' "$(_cycle $(( w-2 )) '█' "$off" "$fp")"; fi ;;   # full-width fire-blast finale
 
         race)        local V=(🏎️ 🚗 🚙 🛻 🏍️ 🚜 🚓 🚕) ga gb; ga=${V[$(( seed%8 ))]}; gb=${V[$(( (seed/5+3)%8 ))]}; [ "$gb" = "$ga" ] && gb=${V[$(( (seed/5+4)%8 ))]}
@@ -233,7 +277,7 @@ anim_frame() {
                      if   [ "$pm" -lt 110 ]; then printf '%s%s%s%s%s' "$Lg" "$(_dots "$half")" "$(_text ' 3 ' "$off" FIRE_CLASSIC)" "$(_dots "$half")" "$Rg"
                      elif [ "$pm" -lt 220 ]; then printf '%s%s%s%s%s' "$Lg" "$(_dots "$half")" "$(_text ' 2 ' "$off" FIRE_CLASSIC)" "$(_dots "$half")" "$Rg"
                      elif [ "$pm" -lt 330 ]; then printf '%s%s%s%s%s' "$Lg" "$(_dots "$half")" "$(_text ' 1 ' "$off" FIRE_CLASSIC)" "$(_dots "$half")" "$Rg"
-                     elif [ "$pm" -lt 700 ]; then printf '%s💥%s%s%s💥%s' "$Lg" "$(_cycle $(( half-2 )) '─' "$off" FIRE_CLASSIC)" "$(_text ' DRAW! ' "$off" RACE_GOLD)" "$(_cycle $(( half-2 )) '─' "$off" FIRE_CLASSIC)" "$Rg"
+                     elif [ "$pm" -lt 700 ]; then printf '%s💥%s%s%s💥%s' "$Lg" "$(_cycle $(( half-2 )) '─' "$off" FIRE_CLASSIC)" "$(_text ' FIRE! ' "$off" RACE_GOLD)" "$(_cycle $(( half-2 )) '─' "$off" FIRE_CLASSIC)" "$Rg"
                      else local rr=$(( seed%10 )) sh
                          if   [ "$rr" -eq 0 ]; then sh=$(( (span-18)/2 )); [ "$sh" -lt 0 ] && sh=0; printf '💀%s%s%s💀' "$(_dots "$sh")" "$(_text ' DOUBLE K.O.! ' "$off" FIRE_CLASSIC)" "$(_dots "$sh")"
                          elif [ "$win" -eq 0 ]; then sh=$(( (span-13)/2 )); [ "$sh" -lt 0 ] && sh=0; printf '🤠🎉%s%s%s💀' "$(_dots "$sh")" "$(_text ' BANG! ' "$off" FIRE_CLASSIC)" "$(_dots "$sh")"
@@ -246,13 +290,109 @@ anim_frame() {
                      elif [ "$pm" -lt 444 ]; then printf '🗼🚀%s%s%s' "$(_text ' LIFTOFF! ' "$off" FIRE_EMBER)" "$(_cycle 2 '╿' "$off" FIRE_EMBER)" "$(_dots $(( span-13 )))"
                      elif [ "$pm" -lt 889 ]; then local rc=$(( (pm-444)*(span-4)/445 )); [ "$rc" -lt 0 ] && rc=0
                          printf '%s🚀%s' "$(_cycle "$rc" '╿' "$off" FIRE_EMBER)" "$(_dots $(( span-rc-2<0?0:span-rc-2 )))"
-                     elif [ "$res" -lt 6 ]; then local fl; fl=$(_pick "$seed" '✨' '🌟')
+                     elif [ "$res" -lt 5 ]; then local fl; fl=$(_pick "$seed" '✨' '🌟')                       # ~50% clean orbit
                          printf '%s🚀%s%s' "$(_cycle $(( span-8 )) '╿' "$off" FIRE_EMBER)" "$fl" "$(_text ' ORBIT! ' "$off" ICE_GLACIER)"
-                     elif [ "$res" -lt 9 ]; then local CL=(231 196 51) sc=${CL[$(( (pm/40)%3 ))]}
+                     elif [ "$res" -lt 8 ]; then local CL=(231 196 51) sc=${CL[$(( (pm/40)%3 ))]}            # ~30% rapid unscheduled disassembly
                          printf '%s\e[1;38;5;%dm💥💥💥%s%s%s' "$(_dots $(( span/2-6 )))" "$sc" "$R" "$(_cycle 3 '✺' "$off" FIRE_CLASSIC)" "$(_text ' RUD! ' "$off" FIRE_CLASSIC)"
                      else local ab; ab=$(_pick "$seed" '💨' '🧯')
                          printf '🗼🚀%s%s%s' "$(_text ' ABORT ' "$off" RACE_STEEL)" "$ab" "$(_dots $(( span-9 )))"; fi ;;
 
+        pacman)      local pw=$(( seed%2 )) pc=$pos fr=$(( span-2 )) gh mouth          # 😮 chomps pellets, 👻 chases, 🍒 power-up
+                     [ "$pc" -gt $(( fr-2 )) ] && pc=$(( fr-2 )); [ "$pc" -lt 0 ] && pc=0; gh=$(( pc-4 )); [ "$gh" -lt 0 ] && gh=0
+                     mouth=$( [ $(( (pm/111)%2 )) -eq 0 ] && printf '😮' || printf '😯' )
+                     if   [ "$pm" -lt 1000 ]; then
+                         printf '%s👻%s%s%s🍒%s' "$(_dots "$gh")" "$(_dots $(( pc-gh-2<0?0:pc-gh-2 )))" "$mouth" "$(_cycle $(( fr-pc-2<0?0:fr-pc-2 )) '•' "$off" PAC_MAZE)" "$(_dots $(( span-fr-2<0?0:span-fr-2 )))"
+                     elif [ "$pw" -eq 1 ]; then printf '😨💨%s😋🍒%s' "$(_dots $(( fr-6<0?0:fr-6 )))" "$(_dots $(( span-fr-4<0?0:span-fr-4 )))"
+                     else printf '%s👻😮🍒%s' "$(_dots $(( fr-4<0?0:fr-4 )))" "$(_dots $(( span-fr-4<0?0:span-fr-4 )))"; fi ;;
+        snake)       local g=$(( seed%4 )) len=$(( 2+pm/150 )) hd=$pos ap=$(( span-2 ))   # 🟢 snake grows, chases 🍎; eats it or hits the wall
+                     [ "$hd" -gt $(( ap-2 )) ] && hd=$(( ap-2 )); [ "$hd" -lt 0 ] && hd=0; [ "$len" -gt "$hd" ] && len=$hd
+                     if   [ "$pm" -lt 1000 ]; then
+                         printf '%s%s🟢%s🍎%s' "$(_dots $(( hd-len<0?0:hd-len )))" "$(_fade "$len" 'o' SNAKE_GRN L)" "$(_dots $(( ap-hd-2<0?0:ap-hd-2 )))" "$(_dots $(( span-ap-2<0?0:span-ap-2 )))"
+                     elif [ "$g" -ne 0 ]; then printf '%s🟢🍎😋%s' "$(_fade $(( ap-2<0?0:ap-2 )) 'o' SNAKE_GRN L)" "$(_dots $(( span-ap-4<0?0:span-ap-4 )))"
+                     else printf '%s🟢💥%s' "$(_fade $(( ap-2<0?0:ap-2 )) 'o' SNAKE_GRN L)" "$(_dots $(( span-ap-2<0?0:span-ap-2 )))"; fi ;;
+        meteor)      local save=$(( seed%3 )) mcol=$(( span-pos ))                       # ☄ incoming, 🚀 intercepts -> deflect or 💥 impact
+                     [ "$mcol" -lt 3 ] && mcol=3; [ "$mcol" -gt $(( span-4 )) ] && mcol=$(( span-4 ))
+                     if   [ "$pm" -lt 666 ]; then printf '🌍%s☄%s' "$(_dots $(( mcol-2<0?0:mcol-2 )))" "$(_fade $(( span-mcol-2<0?0:span-mcol-2 )) '─' ICE_FROSTFIRE L)"
+                     elif [ "$pm" -lt 888 ]; then [ "$mcol" -lt 4 ] && mcol=4
+                         printf '🌍🚀%s☄%s' "$(_dots $(( mcol-4<0?0:mcol-4 )))" "$(_fade $(( span-mcol-2<0?0:span-mcol-2 )) '─' ICE_FROSTFIRE L)"
+                     elif [ "$pm" -lt 1000 ]; then printf '🌍%s🚀☄%s' "$(_dots $(( mcol-2<0?0:mcol-2 )))" "$(_dots $(( span-mcol-4<0?0:span-mcol-4 )))"
+                     elif [ "$save" -lt 2 ]; then printf '🌍%s🛡✨' "$(_dots $(( span-6<0?0:span-6 )))"
+                     else printf '💥🌍🔥%s' "$(_cycle $(( span-6<0?0:span-6 )) '▒' "$off" FIRE_EMBER)"; fi ;;
+        llama)       local out=$(( seed%3 )) vic; vic=$(_pick "$seed" '🧍' '🐑' '🤠' '🌵')   # 🦙 hocks a wad of spit at a victim
+                     local sp=$(( 2 + pm*(span-6)/1000 ))
+                     if   [ "$pm" -lt 1000 ]; then printf '🦙%s%s%s%s' "$(_dots $(( sp-2<0?0:sp-2 )))" "$(_cycle 1 '~' "$off" SPIT)" "$(_dots $(( span-sp-3<0?0:span-sp-3 )))" "$vic"
+                     elif [ "$out" -lt 2 ]; then printf '🦙%s💦😵' "$(_dots $(( span-6<0?0:span-6 )))"
+                     else printf '🤮%s😏' "$(_dots $(( span-4<0?0:span-4 )))"; fi ;;
+        bananapeel)  local fate=$(( seed%4 )) pose; pose=$(_pick "$seed" '🤕' '😵' '💫')      # 🚶 + 🍌 -> glorious wipeout (or rare dodge)
+                     local bx=$(( span*2/3 )) wp; wp=$(( pm*(bx-2)/555 )); [ "$wp" -gt $(( bx-2 )) ] && wp=$(( bx-2 )); [ "$wp" -lt 0 ] && wp=0
+                     if   [ "$pm" -lt 555 ]; then printf '%s🚶%s🍌%s' "$(_dots "$wp")" "$(_dots $(( bx-wp-2<0?0:bx-wp-2 )))" "$(_dots $(( span-bx-2<0?0:span-bx-2 )))"
+                     elif [ "$pm" -lt 888 ]; then local fly; fly=$( [ "$pm" -lt 720 ] && printf '🤸' || printf '💫' )
+                         printf '%s💥%s%s' "$(_dots $(( bx-2<0?0:bx-2 )))" "$fly" "$(_dots $(( span-bx-2<0?0:span-bx-2 )))"
+                     elif [ "$fate" -lt 3 ]; then local lp=$(( (span-13)/2 )); [ "$lp" -lt 0 ] && lp=0
+                         printf '%s%s%s%s' "$pose" "$(_dots "$lp")" "$(_text ' WHOOPSIE! ' "$off" FIRE_CLASSIC)" "$(_dots $(( span-lp-13<0?0:span-lp-13 )))"
+                     else local lp=$(( (span-11)/2 )); [ "$lp" -lt 0 ] && lp=0
+                         printf '🦘%s%s%s😎' "$(_dots "$lp")" "$(_text ' PHEW! ' "$off" BANANA)" "$(_dots $(( span-lp-11<0?0:span-lp-11 )))"; fi ;;
+        trex)        local hlp=$(( seed%3 )) food; food=$(_pick "$seed" '🍪' '🍩' '🥨' '🍖')    # 🦖 tiny arms can't quite reach the snack
+                     local arm=$(( 1 + pm*4/1000 )); [ "$arm" -gt 5 ] && arm=5
+                     if   [ "$pm" -lt 850 ]; then printf '🦖%s·%s▔▔%s' "$(_cycle "$arm" '»' "$off" FIRE_EMBER)" "$food" "$(_dots $(( span-arm-7<0?0:span-arm-7 )))"
+                     elif [ "$hlp" -lt 2 ]; then local lp=$(( (span-15)/2 )); [ "$lp" -lt 0 ] && lp=0
+                         printf '🦖😤%s%s%s' "$(_dots "$lp")" "$(_text ' SO CLOSE! ' "$off" FIRE_CLASSIC)" "$(_dots $(( span-lp-15<0?0:span-lp-15 )))"
+                     else local lp=$(( (span-19)/2 )); [ "$lp" -lt 0 ] && lp=0
+                         printf '🦖😋🍪%s%s%s🦅' "$(_dots "$lp")" "$(_text ' TEAMWORK! ' "$off" RACE_GOLD)" "$(_dots $(( span-lp-19<0?0:span-lp-19 )))"; fi ;;
+        selfdestruct) local forreal=$(( seed%6 ))                                          # 🚨 5..0 countdown that just says "...jk" (rarely: KABOOM)
+                     if   [ "$pm" -lt 600 ]; then local num=$(( 5 - pm/110 )); [ "$num" -lt 0 ] && num=0
+                         local na=$(( 1 + pm/220 )); [ "$na" -gt 3 ] && na=3; local body=" $num " bl; bl=${#body}
+                         local lp=$(( (span-4*na-bl)/2 )); [ "$lp" -lt 0 ] && lp=0; local rp=$(( span-4*na-bl-lp )); [ "$rp" -lt 0 ] && rp=0
+                         printf '%s%s%s%s%s' "$(_solid "$na" '🚨' 196)" "$(_dots "$lp")" "$(_text "$body" "$off" FLASH)" "$(_dots "$rp")" "$(_solid "$na" '🚨' 196)"
+                     elif [ "$pm" -lt 730 ]; then local lp=$(( (span-6)/2 )); [ "$lp" -lt 0 ] && lp=0
+                         printf '%s\e[2m . . .\e[0m%s' "$(_dots "$lp")" "$(_dots $(( span-lp-6<0?0:span-lp-6 )))"
+                     elif [ "$forreal" -ne 0 ]; then local jk; jk=$(_pick "$seed" 'jk 😜' 'nvm 🙃' 'psych! 😏'); local txt="...$jk" dw; dw=$(( ${#txt}+1 ))
+                         local lp=$(( (span-dw)/2 )); [ "$lp" -lt 0 ] && lp=0
+                         printf '%s%s%s' "$(_dots "$lp")" "$(_text "$txt" "$off" RING)" "$(_dots $(( span-lp-dw<0?0:span-lp-dw )))"
+                     else printf '💥💥%s💥💥' "$(_cycle $(( span-8<0?0:span-8 )) '▰' "$off" FIRE_CLASSIC)"; fi ;;
+        warp)        local lvl=$(( pm/170 )); [ "$lvl" -gt 5 ] && lvl=5                    # hyperdrive: star-streaks accelerate -> JUMP
+                     local glyphs=(· ‧ - ─ ━ ═) mwm=${#WARP_BLU[@]} s='' g; g="${glyphs[$lvl]}"
+                     if   [ "$pm" -lt 850 ]; then local thr=$(( 11 - pm/110 )); [ "$thr" -lt 2 ] && thr=2
+                         for ((i=0;i<span;i++)); do if [ $(( (i*7+off)%thr )) -eq 0 ]; then s+=$'\e[1;38;5;'"${WARP_BLU[$(( (i+off)%mwm ))]}"m"$g"; else s+=$'\e[38;5;236m''·'; fi; done
+                         printf '%s%s' "$s" "$R"
+                     elif [ "$pm" -lt 940 ]; then printf '%s' "$(_solid "$span" '█' 231)"
+                     else local rail=$(( (span-10)/2 )); [ "$rail" -lt 0 ] && rail=0
+                         printf '%s%s%s' "$(_cycle "$rail" '═' "$off" WARP_BLU)" "$(_text ' ◈ JUMP ◈ ' "$off" WARP_BLU)" "$(_cycle $(( span-rail-10<0?0:span-rail-10 )) '═' $((off+4)) WARP_BLU)"; fi ;;
+        decrypt)     local MSGS=('ACCESS GRANTED' 'LINK ESTABLISHED' 'KEY ACCEPTED' 'SYS ONLINE')   # matrix scramble resolves L->R into text
+                     local msg="${MSGS[$(( seed%4 ))]}" pool='#%&@$01<>/=+*?:;~' pl; pl=${#pool}
+                     local n=$span s='' mm=${#MATRIX[@]} lock ml; lock=$(( pm*n/1000 )); ml=${#msg}; [ "$ml" -gt "$n" ] && { msg="${msg:0:$n}"; ml=$n; }
+                     local lpad=$(( (n-ml)/2 ))
+                     for ((i=0;i<n;i++)); do
+                         if   [ "$i" -lt "$lock" ]; then local rel=$(( i-lpad ))
+                             if [ "$rel" -ge 0 ] && [ "$rel" -lt "$ml" ]; then s+=$'\e[1;38;5;46m'"${msg:rel:1}"; else s+=$'\e[38;5;28m''·'; fi
+                         elif [ "$i" -eq "$lock" ]; then s+=$'\e[1;38;5;231m'"${pool:$(( (i+off)%pl )):1}"
+                         else s+=$'\e[38;5;'"${MATRIX[$(( (i*5+off+seed)%mm ))]}"m"${pool:$(( (i*3+off)%pl )):1}"; fi; done
+                     printf '%s%s' "$s" "$R" ;;
+        radar)       local n=$span head; head=$(( pm*(n-1)/1000 )); [ "$head" -ge "$n" ] && head=$(( n-1 ))   # sonar sweep with fading trail + contact blips
+                     local nb=$(( 2+seed%3 )) s='' j; local -a blip=(); for ((j=0;j<nb;j++)); do blip+=( $(( (seed*7+j*53+11)%n )) ); done
+                     for ((i=0;i<n;i++)); do local d=$(( head-i )) isb=0
+                         for ((j=0;j<nb;j++)); do [ "${blip[$j]}" -eq "$i" ] && isb=1; done
+                         if   [ "$i" -eq "$head" ]; then s+=$'\e[1;38;5;231m''┃'
+                         elif [ "$d" -ge 1 ] && [ "$d" -le 6 ]; then local ti=$(( (d-1)*9/6 )); s+=$'\e[38;5;'"${RADAR_GRN[$ti]}"m'╎'
+                         elif [ "$isb" -eq 1 ]; then if [ "$d" -ge -1 ] && [ "$d" -le 2 ]; then s+=$'\e[1;38;5;231m''●'; else s+=$'\e[38;5;28m''◦'; fi
+                         else s+=$'\e[38;5;22m''·'; fi; done
+                     printf '%s%s' "$s" "$R" ;;
+        helix)       local n=$span s='' mc=${#HUD_CYAN[@]} mp=${#PLASMA[@]} per half                  # DNA double-helix scroll (braille ribbons)
+                     per=$(( 6+seed%3 )); half=$(( per/2 )); local up=(⠁ ⠂ ⠄ ⡀ ⢀ ⠠ ⠐ ⠈)
+                     for ((i=0;i<n;i++)); do local ph=$(( (i+off)%per )) a b; a=$(( ph*8/per )); b=$(( ((ph+half)%per)*8/per )); [ "$a" -gt 7 ] && a=7; [ "$b" -gt 7 ] && b=7
+                         if   [ "$ph" -eq 0 ] || [ "$ph" -eq "$half" ]; then s+=$'\e[1;38;5;231m''═'
+                         elif [ "$ph" -lt "$half" ]; then s+=$'\e[38;5;'"${HUD_CYAN[$(( (i+off)%mc ))]}"m"${up[$a]}"
+                         else s+=$'\e[38;5;'"${PLASMA[$(( (i+off)%mp ))]}"m"${up[$b]}"; fi; done
+                     printf '%s%s' "$s" "$R" ;;
+        boot)        local n=$span                                                          # holographic boot: subsystems report -> SYSTEM ONLINE
+                     if [ "$pm" -ge 920 ]; then local BAN=(' SYSTEM ONLINE ' ' ALL SYSTEMS GO ' ' READY ') b bl rail
+                         b="${BAN[$(( seed%3 ))]}"; bl=${#b}; rail=$(( (n-bl)/2 )); [ "$rail" -lt 0 ] && rail=0
+                         printf '%s%s%s' "$(_cycle "$rail" '─' "$off" HUD_CYAN)" "$(_text "$b" "$off" HUD_CYAN)" "$(_cycle $(( n-rail-bl<0?0:n-rail-bl )) '─' $((off+3)) HUD_CYAN)"
+                     else local SUB=(CORE MEM NET GPU AI) si=$(( pm*5/1000 )); [ "$si" -gt 4 ] && si=4
+                         local pct=$(( pm/10 )) lab="${SUB[$si]}" okf=$(( (pm/111)%2 )) tag
+                         if [ "$okf" -eq 0 ]; then tag=" ${pct}% ${lab} [OK]"; else tag=" ${pct}% ${lab}"; fi
+                         local tl=${#tag} barw bf; barw=$(( n-tl )); [ "$barw" -lt 4 ] && barw=4; bf=$(( pm*barw/1000 )); [ "$bf" -gt "$barw" ] && bf=$barw
+                         printf '%s%s\e[1;38;5;46m%s%s' "$(_fade "$bf" '▰' HUD_CYAN R)" "$(_solid $(( barw-bf )) '▱' 23)" "$tag" "$R"; fi ;;
         seth)        _signature 'SETH M. WOODBURY' 'SethWoodbury' '' ;;                                                         # the author's signature
         credits)     local nm; nm=$(printf '%s' "$SIG_NAME" | tr '[:lower:]' '[:upper:]')                                      # customizable (set SIG_NAME/SIG_GH)
                      _signature "$nm" "$SIG_GH" 'beautiful_fun_claude by SethWoodbury' ;;
