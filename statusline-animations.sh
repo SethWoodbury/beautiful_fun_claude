@@ -424,17 +424,20 @@ anim_frame() {
                          printf '%s%s🟢%s🍎%s' "$(_dots $(( hd-len<0?0:hd-len )))" "$(_fade "$len" 'o' SNAKE_GRN L)" "$(_dots $(( ap-hd-2<0?0:ap-hd-2 )))" "$(_dots $(( span-ap-2<0?0:span-ap-2 )))"
                      elif [ "$g" -ne 0 ]; then printf '%s🟢🍎😋%s' "$(_fade $(( ap-2<0?0:ap-2 )) 'o' SNAKE_GRN L)" "$(_dots $(( span-ap-4<0?0:span-ap-4 )))"
                      else printf '%s🟢💥%s' "$(_fade $(( ap-2<0?0:ap-2 )) 'o' SNAKE_GRN L)" "$(_dots $(( span-ap-2<0?0:span-ap-2 )))"; fi ;;
-        meteor)      local save=$(( seed%3 )) mcol=$(( span-pos ))                       # ☄ incoming, 🚀 intercepts -> deflect or 💥 impact
-                     [ "$mcol" -lt 3 ] && mcol=3; [ "$mcol" -gt $(( span-4 )) ] && mcol=$(( span-4 ))
-                     if   [ "$pm" -lt 666 ]; then printf '🌍%s☄%s' "$(_dots $(( mcol-2<0?0:mcol-2 )))" "$(_fade $(( span-mcol-2<0?0:span-mcol-2 )) '─' ICE_FROSTFIRE L)"
-                     elif [ "$pm" -lt 888 ]; then [ "$mcol" -lt 4 ] && mcol=4
-                         printf '🌍🚀%s☄%s' "$(_dots $(( mcol-4<0?0:mcol-4 )))" "$(_fade $(( span-mcol-2<0?0:span-mcol-2 )) '─' ICE_FROSTFIRE L)"
-                     elif [ "$pm" -lt 1000 ]; then printf '🌍%s🚀☄%s' "$(_dots $(( mcol-2<0?0:mcol-2 )))" "$(_dots $(( span-mcol-4<0?0:span-mcol-4 )))"
-                     elif [ "$save" -lt 2 ]; then printf '🌍%s🛡✨' "$(_dots $(( span-6<0?0:span-6 )))"
+        meteor)      local save=$(( seed%3 )) c=$(( span/2 ))                              # ☄ incoming + 🚀 intercept that visibly MEET at centre -> SAVED / 💥 impact
+                     if   [ "$pm" -lt 450 ]; then local mc; mc=$(( span-2 - pm*(span-6)/450 )); [ "$mc" -lt 4 ] && mc=4   # ☄ races in from the right
+                         printf '🌍%s☄%s' "$(_dots $(( mc-2<0?0:mc-2 )))" "$(_fade $(( span-mc-2<0?0:span-mc-2 )) '─' ICE_FROSTFIRE L)"
+                     elif [ "$pm" -lt 780 ]; then local rc mc; rc=$(( 2 + (pm-450)*(c-4)/330 )); [ "$rc" -gt $(( c-2 )) ] && rc=$(( c-2 )); mc=$(( span-2 - (pm-450)*(span-4-c)/330 )); [ "$mc" -lt $(( c+2 )) ] && mc=$(( c+2 ))   # 🚀 launches, both close on centre
+                         printf '🌍%s🚀%s☄%s' "$(_dots $(( rc-2<0?0:rc-2 )))" "$(_dots $(( mc-rc-2<0?0:mc-rc-2 )))" "$(_dots $(( span-mc-2<0?0:span-mc-2 )))"
+                     elif [ "$pm" -lt 900 ]; then local lp=$(( c-2 )); [ "$lp" -lt 0 ] && lp=0   # COLLISION at centre
+                         printf '🌍%s\e[1;38;5;231m💥💥%s%s' "$(_dots "$lp")" "$R" "$(_dots $(( span-lp-6<0?0:span-lp-6 )))"
+                     elif [ "$save" -lt 2 ]; then local t=' SAVED! ' tl lp rp; tl=${#t}; lp=$(( (span-tl-6)/2 )); [ "$lp" -lt 0 ] && lp=0; rp=$(( span-tl-6-lp )); [ "$rp" -lt 0 ] && rp=0   # 🚀 deflects it
+                         printf '🌍%s🚀%s%s✨' "$(_dots "$lp")" "$(_text "$t" "$off" ICE_GLACIER)" "$(_dots "$rp")"
                      else printf '💥🌍🔥%s' "$(_cycle $(( span-6<0?0:span-6 )) '▒' "$off" FIRE_EMBER)"; fi ;;
-        llama)       local out=$(( seed%3 )) vic; vic=$(_pick "$seed" '🧍' '🐑' '🤠' '🌵')   # 🦙 (right, faces left) spits leftward at a victim (left)
+        llama)       local out=$(( seed%3 )) vic; vic=$(_pick "$seed" '🧍' '🐑' '🤠' '🌵')   # 🦙 (right) spits a VISIBLE glob ● leftward; victim braces 😨 then SPLAT / MISS
                      local sp; sp=$(( (span-4) - pm*(span-7)/1000 )); [ "$sp" -lt 3 ] && sp=3; [ "$sp" -gt $(( span-4 )) ] && sp=$(( span-4 ))
-                     if   [ "$pm" -lt 1000 ]; then printf '%s%s%s%s🦙' "$vic" "$(_dots $(( sp-2<0?0:sp-2 )))" "$(_cycle 1 '~' "$off" SPIT)" "$(_dots $(( span-sp-3<0?0:span-sp-3 )))"
+                     local face="$vic"; [ "$pm" -ge 800 ] && [ "$out" -lt 2 ] && face='😨'
+                     if   [ "$pm" -lt 1000 ]; then printf '%s%s\e[1;38;5;120m●%s%s🦙' "$face" "$(_dots $(( sp-3<0?0:sp-3 )))" "$(_fade 2 '~' SPIT R)" "$(_dots $(( span-sp-4<0?0:span-sp-4 )))"
                      elif [ "$out" -lt 2 ]; then printf '😵💦%s🦙' "$(_dots $(( span-6<0?0:span-6 )))"      # SPLAT — victim hit
                      else printf '😏%s🤮' "$(_dots $(( span-4<0?0:span-4 )))"; fi ;;                       # MISS — boomerangs into its own face
         bananapeel)  local fate=$(( seed%4 )) pose; pose=$(_pick "$seed" '🤕' '😵' '💫')      # 🚶 + 🍌 -> glorious wipeout (or rare dodge)
@@ -447,7 +450,7 @@ anim_frame() {
                      else local lp=$(( (span-11)/2 )); [ "$lp" -lt 0 ] && lp=0
                          printf '🦘%s%s%s😎' "$(_dots "$lp")" "$(_text ' PHEW! ' "$off" BANANA)" "$(_dots $(( span-lp-11<0?0:span-lp-11 )))"; fi ;;
         trex)        local hlp=$(( seed%3 )) food; food=$(_pick "$seed" '🍪' '🍩' '🥨' '🍖')    # 🦖 (right, faces left) — tiny arms can't reach the snack on the left
-                     local arm=$(( 1 + pm*4/1000 )); [ "$arm" -gt 5 ] && arm=5
+                     local arm=$(( 1 + (pm/100)%5 ))   # arms PULSE: reach… retract… reach… (no longer frozen)
                      if   [ "$pm" -lt 850 ]; then printf '%s▔▔%s%s%s🦖' "$(_dots $(( span-12<0?0:span-12 )))" "$food" "$(_dots $(( 6-arm )))" "$(_cycle "$arm" '«' "$off" FIRE_EMBER)"
                      elif [ "$hlp" -lt 2 ]; then local lp rp; lp=$(( (span-19)/2 )); [ "$lp" -lt 0 ] && lp=0; rp=$(( span-19-lp )); [ "$rp" -lt 0 ] && rp=0
                          printf '▔▔%s%s%s%s😤🦖' "$food" "$(_dots "$lp")" "$(_text ' SO CLOSE! ' "$off" FIRE_CLASSIC)" "$(_dots "$rp")"
@@ -533,6 +536,8 @@ anim_frame() {
                          cp="$gy$pre$(_text "$kw" "$off" FLASH)$gy$mid$(_text "$rw" "$((off+4))" DISCO_NEON)$R"
                          if   [ $(( ml+6 )) -le "$span" ]; then local tot=$(( ml+6 )) lp rp; lp=$(( (span-tot)/2 )); [ "$lp" -lt 0 ] && lp=0; rp=$(( span-lp-tot )); [ "$rp" -lt 0 ] && rp=0
                              printf '%s🤖 %s 🤖%s' "$(_dots "$lp")" "$cp" "$(_dots "$rp")"
+                         elif [ $(( ml+3 )) -le "$span" ]; then local lp; lp=$(( (span-ml-3)/2 )); [ "$lp" -lt 0 ] && lp=0   # keep ONE 🤖 when the full framing won't fit
+                             printf '%s🤖 %s%s' "$(_dots "$lp")" "$cp" "$(_dots $(( span-lp-ml-3<0?0:span-lp-ml-3 )))"
                          elif [ "$ml" -le "$span" ]; then local lp; lp=$(( (span-ml)/2 )); [ "$lp" -lt 0 ] && lp=0
                              printf '%s%s%s' "$(_dots "$lp")" "$cp" "$(_dots $(( span-lp-ml<0?0:span-lp-ml )))"
                          else printf '%s' "$(_text "${msg:0:$(( span>1?span-1:1 ))}…" "$off" FLASH)"; fi
