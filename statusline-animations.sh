@@ -51,6 +51,18 @@ LASER_GRN=(231 194 157 120 83 46 40 34 28 22)         # Death Star superlaser gr
 PH_PINK=(231 230 224 225 218 219 213 207 206 205)     # titration: clear -> SHOCKING phenolphthalein pink
 FLAME_TEST=(196 208 226 46 51 201 129)                # flame test: Li/Ca/Na/Ba/Cu/K element colors
 GFP_GLOW=(231 195 159 156 154 118 82 46 40 34)        # fluorescent GFP green glow (folded protein)
+PH_DEEP=(218 219 213 207 206 205 199 198 197 163 127 91)   # titration overshoot: pink -> magenta -> violet
+# --- flame test: ONE ramp per element (bright core -> the element's real flame colour -> dark tail) ---
+FLAME_LI=(231 224 217 210 203 196 160 124 88)         # Li  crimson red
+FLAME_NA=(231 230 229 228 227 226 220 214 178)        # Na  intense sodium yellow
+FLAME_K=(231 225 219 183 177 141 135 99 57)           # K   lilac / violet
+FLAME_CU=(231 195 159 123 87 50 44 37 30)             # Cu  blue-green / emerald
+FLAME_CA=(231 230 223 216 209 202 166 130 94)         # Ca  orange-red
+FLAME_BA=(231 194 157 156 120 113 78 71 65)           # Ba  pale apple-green
+FLAME_SR=(231 224 218 211 204 197 161 125 89)         # Sr  scarlet red
+FLAME_B=(231 195 158 121 84 47 41 35 29)              # B   bright green
+FLAME_SYM=(Li Na K Cu Ca Ba Sr B)
+FLAME_RAMP=(FLAME_LI FLAME_NA FLAME_K FLAME_CU FLAME_CA FLAME_BA FLAME_SR FLAME_B)
 # --- customize the `credits` animation with YOUR name/handle (env-overridable) ---
 # Default is a placeholder so you SEE it asking to be replaced. ('David Baker' is the
 # Baker Lab director — our stand-in name; swap the WHOLE string for your own.)
@@ -521,26 +533,42 @@ anim_frame() {
                          printf '}=>💨%s%s%s🙌 🧎' "$(_dots "$lp")" "$(_text "$t" "$off" RACE_GOLD)" "$(_dots "$rp")"
                      else local t=' …cannot be done ' tl lp rp; tl=${#t}; [ $(( tl+9 )) -gt "$span" ] && { t="${t:0:$(( span-10>1?span-10:1 ))}…"; tl=${#t}; }; lp=$(( (span-tl-9)/2 )); [ "$lp" -lt 0 ] && lp=0; rp=$(( span-tl-9-lp )); [ "$rp" -lt 0 ] && rp=0   # flop: sinks back 💦
                          printf '💦}=%s%s%s🧍 🧎' "$(_dots "$lp")" "$(_text "$t" "$off" OCEAN_DUSK)" "$(_dots "$rp")"; fi ;;
-        titrate)     local over=$(( seed%5 ))                                                            # 🧪 clear -> SHOCKING pink ENDPOINT (or overshoot 🍷)
-                     if   [ "$pm" -lt 780 ]; then local s='' n=$(( span-2 )) c r i mp=${#PH_PINK[@]}; c=$(( n/2 )); r=$(( pm*n/1560 ))
-                         for ((i=0;i<n;i++)); do local d=$(( i-c )); [ "$d" -lt 0 ] && d=$(( -d ))
-                             if [ "$d" -le "$r" ]; then s+=$'\e[38;5;'"${PH_PINK[$(( (d+off)%mp ))]}"m'▒'; else s+=$'\e[38;5;236m''·'; fi; done
-                         printf '🧪%s%s' "$s" "$R"
-                     elif [ "$pm" -lt 900 ]; then printf '🧪%s' "$(_cycle $(( span-2 )) '▓' "$off" PH_PINK)"
-                     elif [ "$over" -ne 4 ]; then local t=' ENDPOINT! ' tl lp rp; tl=${#t}; lp=$(( (span-tl)/2 )); [ "$lp" -lt 0 ] && lp=0; rp=$(( span-tl-lp )); [ "$rp" -lt 0 ] && rp=0
-                         printf '%s%s%s' "$(_cycle "$lp" '█' "$off" PH_PINK)" "$(_text "$t" "$off" PH_PINK)" "$(_cycle "$rp" '█' "$off" PH_PINK)"
-                     else local t=' OVERSHOT! ' tl lp rp; tl=${#t}; lp=$(( (span-tl-4)/2 )); [ "$lp" -lt 0 ] && lp=0; rp=$(( span-tl-4-lp )); [ "$rp" -lt 0 ] && rp=0
-                         printf '😬%s%s%s🍷' "$(_solid "$lp" '▓' 205)" "$(_text "$t" "$off" FIRE_VIOLET)" "$(_solid "$rp" '▓' 205)"; fi ;;
-        flametest)   local out=$(( seed%4 )) el; el=$(_pick "$seed" 'Li!' 'Na!' 'Cu!' 'Ba!' 'K!' 'Ca!' 'Sr!')   # 🔥 flame test — "Cu?… Ba?… it's just SODIUM 🧂"
-                     if   [ "$pm" -lt 250 ]; then local t=' dip the loop… ' tl lp; tl=${#t}; lp=$(( (span-tl-2)/2 )); [ "$lp" -lt 0 ] && lp=0
+        titrate)     local roll=$(( seed%8 )) out pn dmax                                                # 🧪 drip titrant -> pink deepens -> undershoot / just-right / over / WAY over
+                     if   [ "$roll" -lt 2 ]; then out=0; pn=PH_PINK; dmax=2          # UNDERSHOOT — too little, stays pale
+                     elif [ "$roll" -lt 5 ]; then out=1; pn=PH_PINK; dmax=5          # JUST RIGHT — faint permanent pink
+                     elif [ "$roll" -lt 7 ]; then out=2; pn=PH_PINK; dmax=9          # SLIGHT OVER — a touch too much
+                     else out=3; pn=PH_DEEP; dmax=11; fi                             # WAY OVER — deep magenta/violet
+                     local -n PALN="$pn"; local mlen=${#PALN[@]}; [ "$dmax" -ge "$mlen" ] && dmax=$(( mlen-1 ))
+                     local sw; sw=$( [ $(( (pm/111)%2 )) -eq 0 ] && printf '◐' || printf '◑' )
+                     if   [ "$pm" -lt 860 ]; then local body=$(( span-3 )) di col; di=$(( pm*dmax/860 )); [ "$di" -gt "$dmax" ] && di=$dmax; [ "$di" -lt 0 ] && di=0; col=${PALN[$di]}
+                         printf '🧪\e[1;38;5;87m%s\e[1;38;5;231m°%s%s' "$sw" "$(_solid $(( body-1<0?0:body-1 )) '▒' "$col")" "$R"
+                     else local t gl bk1 bk2 ec col; col=${PALN[$dmax]}
+                         case "$out" in 0) t=' …add more ' gl='▒' bk1='😕' bk2='' ;; 1) t=' ENDPOINT! ' gl='▒' bk1='🎯' bk2='' ;; 2) t=' …a touch over ' gl='▓' bk1='😬' bk2='' ;; *) t=' WAY OVERSHOT!! ' gl='█' bk1='🍷' bk2='💀' ;; esac
+                         local tl=${#t}; ec=2; [ -n "$bk2" ] && ec=4; [ $(( tl+ec )) -gt "$span" ] && { t=' OVERSHOT!! '; tl=${#t}; }
+                         local lp=$(( (span-tl-ec)/2 )); [ "$lp" -lt 0 ] && lp=0; local rp=$(( span-tl-ec-lp )); [ "$rp" -lt 0 ] && rp=0
+                         if [ -n "$bk2" ]; then printf '%s%s%s%s%s' "$bk1" "$(_solid "$lp" "$gl" "$col")" "$(_text "$t" "$off" "$pn")" "$(_solid "$rp" "$gl" "$col")" "$bk2"
+                         else printf '%s%s%s%s' "$bk1" "$(_solid "$lp" "$gl" "$col")" "$(_text "$t" "$off" "$pn")" "$(_solid "$rp" "$gl" "$col")"; fi; fi ;;
+        flametest)   local e=$(( seed%8 )) gag ramp sym; gag=$(( seed%5==0 ? 1 : 0 ))   # 🔥 flame burns the element's REAL colour (radiating from the wire) -> surprise reveal
+                     sym="${FLAME_SYM[$e]}"; ramp="${FLAME_RAMP[$e]}"; [ "$gag" -eq 1 ] && { ramp=FLAME_NA; sym=Na; }
+                     local -n RP="$ramp"; local m=${#RP[@]}
+                     if   [ "$pm" -lt 110 ]; then local t=' dip the loop… ' tl lp; tl=${#t}; [ $(( tl+2 )) -gt "$span" ] && { t=' dip… '; tl=${#t}; }; lp=$(( (span-tl-2)/2 )); [ "$lp" -lt 0 ] && lp=0
                          printf '🔥%s%s%s' "$(_dots "$lp")" "$(_text "$t" "$off" SMOKE)" "$(_dots $(( span-lp-tl-2<0?0:span-lp-tl-2 )))"
-                     elif [ "$pm" -lt 760 ]; then local g; g=$(_pick "$(( seed+pm/110 ))" 'Cu?' 'Ba?' 'Sr?' 'K??' 'Na?' 'Li?'); local t=" $g what colour?? " tl lp; tl=${#t}; lp=$(( (span-tl-2)/2 )); [ "$lp" -lt 0 ] && lp=0
-                         printf '🔥%s%s%s' "$(_cycle "$lp" '▀' "$off" FLAME_TEST)" "$(_text "$t" "$off" FLAME_TEST)" "$(_cycle $(( span-lp-tl-2<0?0:span-lp-tl-2 )) '▀' $((off+3)) FLAME_TEST)"
-                     elif [ "$pm" -lt 900 ]; then printf '🔥%s' "$(_cycle $(( span-2 )) '█' "$off" FLAME_TEST)"
-                     elif [ "$out" -ne 3 ]; then local t=" IT'S $el " tl lp rp; tl=${#t}; lp=$(( (span-tl-2)/2 )); [ "$lp" -lt 0 ] && lp=0; rp=$(( span-tl-2-lp )); [ "$rp" -lt 0 ] && rp=0
-                         printf '🔥%s%s%s' "$(_cycle "$lp" '█' "$off" FLAME_TEST)" "$(_text "$t" "$off" FLASH)" "$(_cycle "$rp" '█' "$off" FLAME_TEST)"
-                     else local t=' …just SODIUM ' tl lp rp; tl=${#t}; lp=$(( (span-tl-4)/2 )); [ "$lp" -lt 0 ] && lp=0; rp=$(( span-tl-4-lp )); [ "$rp" -lt 0 ] && rp=0
-                         printf '🔥%s%s%s🧂' "$(_solid "$lp" '█' 226)" "$(_text "$t" "$off" FLASH)" "$(_solid "$rp" '█' 226)"; fi ;;
+                     elif [ "$pm" -lt 360 ]; then local n=$(( span-2 )) c r s='' i; c=$(( n/2 )); r=$(( pm*c/360 )); [ "$r" -lt 1 ] && r=1   # plume radiates outward from the centre wire
+                         for ((i=0;i<n;i++)); do local d=$(( i-c )); [ "$d" -lt 0 ] && d=$(( -d ))
+                             if [ "$d" -le "$r" ]; then local idx gl; idx=$(( d*(m-1)/(r>0?r:1) )); [ "$idx" -ge "$m" ] && idx=$(( m-1 ))
+                                 if [ $(( d*3 )) -le "$r" ]; then gl='█'; elif [ $(( d*2 )) -le "$r" ]; then gl='▓'; elif [ $(( d*3 )) -le $(( 2*r )) ]; then gl='▒'; else gl='░'; fi
+                                 s+=$'\e[38;5;'"${RP[$idx]}"m"$gl"
+                             else s+=$'\e[38;5;236m''·'; fi; done
+                         printf '🔥%s%s' "$s" "$R"
+                     elif [ "$pm" -lt 650 ]; then local g; g=$(_pick "$(( seed+pm/110 ))" 'Cu?' 'Ba?' 'Sr?' 'K??' 'Li?' 'Ca?' 'B??'); local t=" $g what colour?? " tl lp; tl=${#t}; [ $(( tl+2 )) -gt "$span" ] && { t=" $g …?? "; tl=${#t}; }; lp=$(( (span-tl-2)/2 )); [ "$lp" -lt 0 ] && lp=0
+                         printf '🔥%s%s%s' "$(_cycle "$lp" '▀' "$off" "$ramp")" "$(_text "$t" "$off" "$ramp")" "$(_cycle $(( span-lp-tl-2<0?0:span-lp-tl-2 )) '▀' $((off+3)) "$ramp")"
+                     elif [ "$pm" -lt 900 ]; then local n=$(( span-2 )) c s='' i; c=$(( n/2 ))   # full bloom, brightest at the centre
+                         for ((i=0;i<n;i++)); do local d=$(( i-c )); [ "$d" -lt 0 ] && d=$(( -d )); local idx; idx=$(( d*(m-1)/(c>0?c:1) )); [ "$idx" -ge "$m" ] && idx=$(( m-1 )); s+=$'\e[38;5;'"${RP[$idx]}"m'█'; done
+                         printf '🔥%s%s' "$s" "$R"
+                     elif [ "$gag" -eq 1 ]; then local t=' …just SODIUM ' tl lp rp; tl=${#t}; lp=$(( (span-tl-4)/2 )); [ "$lp" -lt 0 ] && lp=0; rp=$(( span-tl-4-lp )); [ "$rp" -lt 0 ] && rp=0
+                         printf '🔥%s%s%s🧂' "$(_solid "$lp" '█' 226)" "$(_text "$t" "$off" FLAME_NA)" "$(_solid "$rp" '█' 226)"
+                     else local t=" IT'S $sym! " tl lp rp; tl=${#t}; lp=$(( (span-tl-2)/2 )); [ "$lp" -lt 0 ] && lp=0; rp=$(( span-tl-2-lp )); [ "$rp" -lt 0 ] && rp=0
+                         printf '🔥%s%s%s' "$(_cycle "$lp" '█' "$off" "$ramp")" "$(_text "$t" "$off" "$ramp")" "$(_cycle "$rp" '█' "$off" "$ramp")"; fi ;;
         ribosome)    local out=$(( seed%5 ))                                                             # 🧬 ribosome builds a rainbow protein -> FOLDED! / STOP CODON
                      if   [ "$pm" -lt 820 ]; then local s='' rc=$pos j; [ "$rc" -gt $(( span-1 )) ] && rc=$(( span-1 ))
                          s="$(_cycle "$rc" '●' "$off" RING)"$'\e[1;38;5;231m''⊙'
