@@ -452,13 +452,17 @@ anim_frame() {
                          printf '%s%s%s%s' "$pose" "$(_dots "$lp")" "$(_text ' WHOOPSIE! ' "$off" FIRE_CLASSIC)" "$(_dots $(( span-lp-13<0?0:span-lp-13 )))"
                      else local lp=$(( (span-11)/2 )); [ "$lp" -lt 0 ] && lp=0
                          printf '🦘%s%s%s😎' "$(_dots "$lp")" "$(_text ' PHEW! ' "$off" BANANA)" "$(_dots $(( span-lp-11<0?0:span-lp-11 )))"; fi ;;
-        trex)        local hlp=$(( seed%3 )) food; food=$(_pick "$seed" '🍪' '🍩' '🥨' '🍖')    # 🦖 (right, faces left) — tiny arms can't reach the snack on the left
-                     local arm=$(( 1 + (pm/100)%5 ))   # arms PULSE: reach… retract… reach… (no longer frozen)
-                     if   [ "$pm" -lt 850 ]; then printf '%s▔▔%s%s%s🦖' "$(_dots $(( span-12<0?0:span-12 )))" "$food" "$(_dots $(( 6-arm )))" "$(_cycle "$arm" '«' "$off" FIRE_EMBER)"
-                     elif [ "$hlp" -lt 2 ]; then local lp rp; lp=$(( (span-19)/2 )); [ "$lp" -lt 0 ] && lp=0; rp=$(( span-19-lp )); [ "$rp" -lt 0 ] && rp=0
-                         printf '▔▔%s%s%s%s😤🦖' "$food" "$(_dots "$lp")" "$(_text ' SO CLOSE! ' "$off" FIRE_CLASSIC)" "$(_dots "$rp")"
-                     else local lp rp; lp=$(( (span-17)/2 )); [ "$lp" -lt 0 ] && lp=0; rp=$(( span-17-lp )); [ "$rp" -lt 0 ] && rp=0
-                         printf '🦅%s%s%s%s🦖' "$(_dots "$lp")" "$(_text ' TEAMWORK! ' "$off" RACE_GOLD)" "$(_dots "$rp")" "$food"; fi ;;
+        trex)        local food; food=$(_pick "$seed" '🍩' '🍪' '🥨' '🍖' '🍗')   # 🦖 jungle standoff: tiny arms strain for a snack just out of reach -> RAAAWR / 🦅 friend / tail flick
+                     local out=$(( seed%3 )) D=8 lp rp; lp=$(( (span-16)/2 )); [ "$lp" -lt 0 ] && lp=0; rp=$(( span-16-lp )); [ "$rp" -lt 0 ] && rp=0
+                     if   [ "$pm" -lt 200 ]; then printf '🌴%s%s%s🦖%s🌙' "$(_dots "$lp")" "$food" "$(_dots "$D")" "$(_dots "$rp")"   # eyes the snack across the gap
+                     elif [ "$pm" -lt 820 ]; then local A G; A=$(( (pm-200)*(D-1)/580 )); [ "$A" -lt 1 ] && A=1; [ "$A" -gt $(( D-1 )) ] && A=$(( D-1 )); G=$(( D-A ))   # «« arms strain, gap shrinks to 1
+                         printf '🌴%s%s%s%s🦖%s🌙' "$(_dots "$lp")" "$food" "$(_dots "$G")" "$(_cycle "$A" '«' "$off" FIRE_EMBER)" "$(_dots "$rp")"
+                     elif [ "$out" -eq 0 ]; then local t=' RAAAWR! ' tl a b; tl=${#t}; a=$(( (span-tl-6)/2 )); [ "$a" -lt 0 ] && a=0; b=$(( span-tl-6-a )); [ "$b" -lt 0 ] && b=0   # gives up, ROARS, snack flies off 💥
+                         printf '💥%s%s%s😤🦖' "$(_dots "$a")" "$(_text "$t" "$off" FIRE_CLASSIC)" "$(_dots "$b")"
+                     elif [ "$out" -eq 1 ]; then local t=' FINALLY! ' tl a b; tl=${#t}; a=$(( (span-tl-6)/2 )); [ "$a" -lt 0 ] && a=0; b=$(( span-tl-6-a )); [ "$b" -lt 0 ] && b=0   # a 🦅 friend drops it in
+                         printf '🦅%s%s%s😋🦖' "$(_dots "$a")" "$(_text "$t" "$off" RACE_GOLD)" "$(_dots "$b")"
+                     else local t=' TAIL FLICK! ' tl a b; tl=${#t}; a=$(( (span-tl-6)/2 )); [ "$a" -lt 0 ] && a=0; b=$(( span-tl-6-a )); [ "$b" -lt 0 ] && b=0   # improvises with its tail 🌀
+                         printf '🌀%s%s%s😋🦖' "$(_dots "$a")" "$(_text "$t" "$off" RACE_GOLD)" "$(_dots "$b")"; fi ;;
         selfdestruct) local forreal=$(( seed%6 ))                                          # 🚨 5..0 countdown that just says "...jk" (rarely: KABOOM)
                      if   [ "$pm" -lt 600 ]; then local num=$(( 5 - pm/110 )); [ "$num" -lt 0 ] && num=0
                          local na=$(( 1 + pm/220 )); [ "$na" -gt 3 ] && na=3; local body=" $num " bl; bl=${#body}
