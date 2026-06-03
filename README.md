@@ -1,10 +1,10 @@
 # 🌈 beautiful fun claude (bfc)
 
-A gorgeous, ridiculous, **fun** status line for [Claude Code](https://code.claude.com/docs/en/statusline) — a calm, colorful info bar most of the time, with periodic full‑width **animated cameos** (a wizard battle, races with photo finishes and wipeouts, a hyperdrive jump, a matrix‑style decrypt, a llama spitting, a T‑rex who can't reach the snack, a self‑destruct that just says "jk", a lightsaber duel, a Death Star, a flaming‑pink titration, nyan‑cat, fireworks, and more — **43 in all**).
+A gorgeous, ridiculous, **fun** status line for [Claude Code](https://code.claude.com/docs/en/statusline) — a calm, colorful info bar most of the time, with periodic full‑width **animated cameos** (a wizard battle, races with photo finishes and wipeouts, a hyperdrive jump, a matrix‑style decrypt, a llama spitting, a T‑rex who can't reach the snack, a self‑destruct that just says "jk", a lightsaber duel, a Death Star, a flaming‑pink titration, Iron Man, a David Goggins chant, nyan‑cat, fireworks, and more — **48 in all**).
 
 ![status bar](assets/statusbar.svg)
 
-Every ~20 seconds the whole bar briefly turns into a full‑width animation — the signature wizard‑battle's energy clash, and 30+ more:
+Every ~20 seconds the whole bar briefly turns into a full‑width animation — the signature wizard‑battle's energy clash, and 40+ more:
 
 ![seth wizard energy clash](assets/seth.svg)
 
@@ -159,7 +159,7 @@ Everything lives in the **CONFIG** and **PALETTE** blocks at the top of `~/.clau
 | `ANIM_EVERY` | `20` | Seconds between cameos (a cameo plays once per window). |
 | `ANIM_FRAMES` | `10` | Length of a cameo in ~1s frames (`credits`→14s, `seth`→18s). |
 | `ANIM_MAXW` | `200` | Max animation width (≈ your bar width). |
-| `ANIM_STYLES=(…)` | all 35 | Which animations rotate; trim to your favorites (or use `bfc only …`). |
+| `ANIM_STYLES=(…)` | all 48 | Which animations rotate; trim to your favorites (or use `bfc only …`). |
 | `SHOW_DECO` | `1` | The `───` end‑caps. |
 | `SHOW_MASCOT`/`SHOW_QUIP`/`SHOW_DIR`/`SHOW_SEVEN_DAY`/… | `1` | Per‑segment toggles. |
 | `TZ_OVERRIDE` | `""` | Pin a timezone (default = system local). |
@@ -175,7 +175,7 @@ Animation palettes and per‑style color/behavior live in `~/.claude/statusline-
 Highlights:
 
 - **Classics & action:** **race** (random lead changes, photo finishes, ~25% wipeouts), **fight** (random knockbacks + winner), **chase** (early/late catch or escape), **rocket** (`T-3→LIFTOFF` then orbit/RUD/abort), **mouse** (a 🐭 cheese‑heist with three endings), **pacman**, **snake**, **fireworks** (staggered multi‑burst), **meteor** (a 🚀 intercepts an incoming ☄ — deflect or impact).
-- **Silly:** **llama** (spit that sometimes boomerangs into its own face), **bananapeel** (glorious wipeout, rare dodge), **trex** (tiny arms, eternal near‑miss, or a 🦅 helps), **selfdestruct** (a 5…0 countdown that just says "…jk" — rarely an actual KABOOM), **computa** (a robot dutifully executing *"COMPUTA, MAKE THESE claude bfc USERS SUPA &lt;kind&gt; AND &lt;respectful&gt;"* — both words randomized).
+- **Silly:** **llama** (spit that sometimes boomerangs into its own face), **bananapeel** (glorious wipeout, rare dodge), **trex** (a 🦖 jungle standoff — tiny arms strain for a snack one cell out of reach, then RAAAWR & gives up / a 🦅 friend drops it in / a clever tail flick), **selfdestruct** (a 5…0 countdown that just says "…jk" — rarely an actual KABOOM), **computa** (a robot dutifully executing *"COMPUTA, MAKE THESE claude bfc USERS SUPA &lt;kind&gt; AND &lt;respectful&gt;"* — both words randomized).
 - **Sci‑fi / aesthetic:** **warp** (hyperdrive star‑streaks → JUMP), **decrypt** (matrix scramble resolving into text), **radar** (sonar sweep → a ridiculous CONTACT: 🛸/🐙/🍕/"…nothing"), **helix** (a braille DNA double‑helix), **boot** (a holographic `SYSTEM ONLINE` sequence).
 - **Star Wars:** **lightsaber** (two blades clash, random winner, "NOOO!"), **deathstar** (superlaser charges → fires → BOOM, or "THAT'S NO MOON 🌝"), **yoda** (raises a big X‑wing `<==[X]==}` from the swamp; on success Luke 🧍 + R2D2 🤖 blast off), **r2d2** (an astromech rolls in, projects a hologram, zaps the blast‑door — DOOR OPEN / "does not compute" / WHEE‑BOOP).
 - **Heroes & legends:** **ironman** (the arc reactor charges and radiates, suit‑up, a repulsor blast, "I AM IRON MAN" → target destroyed / "power at 5%" / "…and a cheeseburger 🍔"), **dgoggins** (relentless: run + sweat → a held flashing chant — "WHO'S GONNA CARRY THE BOATS?!", "STAY HARD!" — 🚣 carry the boat → 💀 TAKING SOULS).
